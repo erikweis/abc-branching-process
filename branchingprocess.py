@@ -1,5 +1,6 @@
 from scipy.stats import nbinom, gamma
 import numpy as np
+from tqdm import tqdm
 
 def single_person_infection(alpha,sigma):
 
@@ -44,27 +45,35 @@ def simulate_branching_process(r0,k,alpha,sigma):
 
     L = []
 
-    for t in range(max_time):
+    count = 0
+    for t in tqdm(np.linspace(0,max_time,100)):
 
-        indices_to_remove = []
-        for index, t_act in enumerate(activation_times):
-            if t_act == t:
+        for t_act in activation_times:
+            if t_act < t:
                 relative_times = np.array(infection(r0,k,alpha,sigma))
                 new_activation_times = relative_times + t
+
                 activation_times += list(new_activation_times)
 
-                indices_to_remove.append(index)
+        removed_times = [x for x in activation_times if x<t]
+        activation_times = [x for x in activation_times if x>=t]
 
-        for index in indices_to_remove:
-            activation_times.pop(index)
+        if len(activation_times)==0:
+            break
+        else:
+            new_cases.append(len(removed_times))
 
-        #each index represents a new case
-        new_cases.append(len(indices_to_remove))
+        if count>10:
+            break
+        else:
+            count+=1
 
-    print(new_cases)
+    #print(new_cases)
+    cum_cases = [sum(new_cases[:i]) for i in range(len(new_cases))]
+    print(cum_cases)
 
 if __name__ == "__main__":
 
-    simulate_branching_process(5,0.5,0.1,0.1)
+    simulate_branching_process(2,0.1,0.5,0.1)
 
 
