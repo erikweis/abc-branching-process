@@ -6,7 +6,7 @@ url = 'https://api.covidtracking.com/v2/states/vt/daily/simple.json'
 
 out = requests.get(url).json()
 
-print(out['data'][0])
+print(json.dumps(out['data'][100],indent=2))
 
 data = out['data'][::-1]
 
