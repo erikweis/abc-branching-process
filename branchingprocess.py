@@ -1,6 +1,9 @@
 from scipy.stats import nbinom, gamma
 import numpy as np
 from tqdm import tqdm
+import requests
+import json
+import heapq
 
 def single_person_infection(alpha,sigma):
 
@@ -11,7 +14,7 @@ def single_person_infection(alpha,sigma):
 
     times = []
     while sum(times) < infection_length:
-        val = gamma.rvs(alpha,scale=1/beta_)
+        val = gamma.rvs(alpha_,scale=1/beta_)
         times.append(val)
 
     relative_infection_times = [sum(times[:i+1]) for i in range(len(times))]
@@ -33,47 +36,83 @@ def infection(r0,k,alpha,sigma):
 
     return relative_times
 
-    
-
-def simulate_branching_process(r0,k,alpha,sigma):
+def simulate_branching_process(r0,k,alpha,sigma,true_data):
     t = 0
     max_time = 90
 
     new_cases = [1]
+    cumulative_case_data = [(0,1)]
 
+    #times when a new person becomes infected
     activation_times = [0]
 
-    L = []
+    events = []
+    next_check_time = 15
+    heapq.heappush(events,0)
 
-    count = 0
-    for t in tqdm(np.linspace(0,max_time,100)):
+    while len(events)>0:
 
-        for t_act in activation_times:
-            if t_act < t:
-                relative_times = np.array(infection(r0,k,alpha,sigma))
-                new_activation_times = relative_times + t
+        time = heapq.heappop(events)
+        print(time)
 
-                activation_times += list(new_activation_times)
+        if time>next_check_time:
+            data_cases = true_data[t]
+            t, cum_cases = cumulative_case_data[-1]
+            error = np.abs(cum_cases-data_cases)/data_cases
+            if error > 0.3:
+                print("errored out. stopped at time",t)
+                return None
 
-        removed_times = [x for x in activation_times if x<t]
-        activation_times = [x for x in activation_times if x>=t]
+            next_check_time += 15
 
-        if len(activation_times)==0:
-            break
-        else:
-            new_cases.append(len(removed_times))
+        relative_times = infection(r0,k,alpha,sigma)
+        for dt in relative_times:
+            heapq.heappush(events,time+dt)
 
-        if count>10:
-            break
-        else:
-            count+=1
+
+    # for t in tqdm(np.linspace(0,max_time,100)):
+
+    #     #check for threshold
+    #     if t in [15,30,45,60,75]:
+    #         data_cases = true_data[t]
+    #         error = np.abs(cumulative_cases[-1]-data_cases)/data_cases
+    #         if error > 0.3:
+    #             print("errored out. stopped at time",t)
+    #             return None
+
+    #     for t_act in activation_times:
+    #         if t_act < t:
+    #             relative_times = np.array(infection(r0,k,alpha,sigma))
+    #             new_activation_times = relative_times + t
+
+    #             activation_times += list(new_activation_times)
+
+    #     removed_times = [x for x in activation_times if x<t]
+    #     activation_times = [x for x in activation_times if x>=t]
+
+    #     if len(activation_times)==0:
+    #         return cumulative_cases
+    #     else:
+    #         current_cumulative_cases = len(removed_times)
+    #         cumulative_cases.append(cumulative_cases[-1]+current_cumulative_cases)
+
+    return cumulative_case_data
+
 
     #print(new_cases)
-    cum_cases = [sum(new_cases[:i]) for i in range(len(new_cases))]
-    print(cum_cases)
+    cumulative_cases = [sum(new_cases[:i]) for i in range(len(new_cases))]
+    print(cumulative_cases)
 
 if __name__ == "__main__":
 
-    simulate_branching_process(2,0.1,0.5,0.1)
+    url = 'https://api.covidtracking.com/v2/states/ny/daily/simple.json'
+    out = requests.get(url).json()
 
+    data = out['data'][::-1]
+
+    cumulative_cases_data = [d['cases']['total'] for d in data[:90]]
+
+    simulated_cases = simulate_branching_process(2,0.1,7.5,1,cumulative_cases_data)
+    print(simulated_cases)
+    
 
