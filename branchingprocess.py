@@ -36,72 +36,80 @@ def infection(r0,k,alpha,sigma):
 
     return relative_times
 
+
+def poisson(alpha,sigma):
+
+    beta_ = alpha
+    alpha_ = sigma
+    return gamma.rvs(alpha_,scale=1/beta_)
+
 def simulate_branching_process(r0,k,alpha,sigma,true_data):
     t = 0
     max_time = 90
 
-    new_cases = [1]
     cumulative_case_data = [(0,1)]
 
-    #times when a new person becomes infected
-    activation_times = [0]
+    next_check_time = 90
 
-    events = []
-    next_check_time = 15
-    heapq.heappush(events,0)
+    #store infected node id, recovery time
+    infected = [0]
+    nodeidx2recoverytime = {0:21}
+
+    #initial_infection
+    t1 = poisson(alpha,sigma)
+
+    total_num_nodes=1
+    events = [('infection',0,t1),('recovery',0,21)]
 
     while len(events)>0:
 
-        time = heapq.heappop(events)
-        print(time)
+        #edit data
+        old_cumulative_cases = cumulative_case_data[-1][1]
 
+        #get event
+        event_type,node,time = heapq.heappop(events)
+
+        #threshold check
         if time>next_check_time:
+            print(cumulative_case_data)
             data_cases = true_data[t]
+            print(data_cases)
             t, cum_cases = cumulative_case_data[-1]
             error = np.abs(cum_cases-data_cases)/data_cases
-            if error > 0.3:
+            if error > 0.9:
                 print("errored out. stopped at time",t)
                 return None
 
             next_check_time += 15
+        elif time>max_time:
+            return cumulative_case_data
 
-        relative_times = infection(r0,k,alpha,sigma)
-        for dt in relative_times:
-            heapq.heappush(events,time+dt)
+        if event_type == 'infection':
+
+            #new infection
+            new_node_id = total_num_nodes
+            total_num_nodes += 1
+            recovery_time = time+21
+
+            infected.append(new_node_id)
+            nodeidx2recoverytime[new_node_id] = recovery_time
+            
+            heapq.heappush(events,('recovery',new_node_id,recovery_time))
+
+            #node infects someone else, if it happens before they recover
+            infection_time = time + poisson(alpha,sigma)
+            if infection_time < nodeidx2recoverytime[node]:
+                heapq.heappush(events,('infection',node,infection_time))            
+
+            cumulative_case_data.append((time,old_cumulative_cases+1))
 
 
-    # for t in tqdm(np.linspace(0,max_time,100)):
+        elif event_type == 'recovery':
 
-    #     #check for threshold
-    #     if t in [15,30,45,60,75]:
-    #         data_cases = true_data[t]
-    #         error = np.abs(cumulative_cases[-1]-data_cases)/data_cases
-    #         if error > 0.3:
-    #             print("errored out. stopped at time",t)
-    #             return None
+            infected.remove(node)
 
-    #     for t_act in activation_times:
-    #         if t_act < t:
-    #             relative_times = np.array(infection(r0,k,alpha,sigma))
-    #             new_activation_times = relative_times + t
-
-    #             activation_times += list(new_activation_times)
-
-    #     removed_times = [x for x in activation_times if x<t]
-    #     activation_times = [x for x in activation_times if x>=t]
-
-    #     if len(activation_times)==0:
-    #         return cumulative_cases
-    #     else:
-    #         current_cumulative_cases = len(removed_times)
-    #         cumulative_cases.append(cumulative_cases[-1]+current_cumulative_cases)
 
     return cumulative_case_data
-
-
-    #print(new_cases)
-    cumulative_cases = [sum(new_cases[:i]) for i in range(len(new_cases))]
-    print(cumulative_cases)
 
 if __name__ == "__main__":
 
@@ -112,7 +120,18 @@ if __name__ == "__main__":
 
     cumulative_cases_data = [d['cases']['total'] for d in data[:90]]
 
-    simulated_cases = simulate_branching_process(2,0.1,7.5,1,cumulative_cases_data)
+    simulated_cases = simulate_branching_process(1,0.1,10,10,cumulative_cases_data)
     print(simulated_cases)
+
+    # alpha = 4
+    # sigma = 4
+
+    # beta_ = alpha
+    # alpha_ = sigma
+    # t1 = gamma.rvs(alpha_,scale=1/beta_,size= 1000)
+
+    # import matplotlib.pyplot as plt
+    # plt.hist(t1)
+    # plt.show()
     
 
