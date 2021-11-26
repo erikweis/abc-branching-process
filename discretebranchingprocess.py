@@ -76,7 +76,7 @@ def simulate_branching_process(cumulative_cases_data, cutoff_time, A_R0, B_R0, A
 
 class Simulation:
 
-    """Class to automatically run simulations 
+    """Class to automatically run simulations.
     """
 
     def __init__(
