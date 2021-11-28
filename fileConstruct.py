@@ -66,9 +66,8 @@ class WriteFiles:
             #SBATCH --partition=short
             #SBATCH --nodes=1
             #SBATCH --mem=1gb
-            #SBATCH --time=02:59:59
+            #SBATCH --time=00:09:59
             #SBATCH --job-name=1997
-
             python discretebranchingprocess.py -f {fpath} -r0 {r0} -k {k} -r {r}"""
 
         
