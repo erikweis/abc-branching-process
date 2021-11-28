@@ -5,6 +5,8 @@ from datetime import datetime
 import pandas as pd
 import os
 import sys
+import argparse
+from typing import Iterable
 
 def neg_binom_pull(r0, k):
     p = r0 / (r0 + k)
@@ -22,7 +24,7 @@ def simulation_within_threshold(cumulative_cases_simulated, cumulative_cases_dat
     return error <= 1
 
 
-def simulate_branching_process(r0, k, state, cutoff_time = None):
+def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time = None):
 
     """ Simulate a branching process with {cutoff_time} steps,
     according to parameters R0 and K, drawn from prior beta
@@ -71,27 +73,39 @@ def simulate_branching_process(r0, k, state, cutoff_time = None):
 
 if __name__ == "__main__":
 
-    print(len(sys.argv))
+    # setup arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f',type=str,help='filename to save the output')
+    parser.add_argument('-r0',type=float,default = 3.5, help='expected secondary infections parameter for negative binomial distribution')
+    parser.add_argument('-k',type= float,default = 0.5, help='dispersion parameter for negative binomial')
+    parser.add_argument('-r',type=float,default = 0.01, help='carry-over infections proportion at each time step')
+    parser.add_argument('--cutoff',default = -1, type=int,help='stop simualtion after N steps')
+    parser.add_argument('--state',default='vt')
 
-    if not 6<= len(sys.argv)<=7:
-        print("USAGE %s : <output_dir> <R0> <k> <r> [cutoff_time]")
+    args = parser.parse_args()
+
+
+    if not args.f:
+        print("No file name called")
         sys.exit(1)
 
-    output_dir = sys.argv[1]
-    state = sys.argv[2]
-    R0 = float(sys.argv[3])
-    k = float(sys.argv[4])
-    r = float(sys.argv[5])
+    cutoff_time = None if args.cutoff < 0 else args.cutoff
+    output = simulate_branching_process(
+        r0 = args.r0,
+        k = args.k,
+        r = args.r,
+        cutoff_time = cutoff_time,
+        state = args.state
+    )
 
-    if len(sys.argv)>6:
-        cutoff_time = int(sys.argv[6])
+    if isinstance(output,str):
+        with open(args.f,'w') as f: 
+            f.write(output)
     else:
-        cutoff_time = None
-    
-    output = simulate_branching_process(R0,k,state,cutoff_time)
-    print(output)
+        df = pd.DataFrame(output,columns = ['cumulative_cases_simulated'])
+        df.to_csv(args.f)
+        
 
-    
 
 
     # url = 'https://api.covidtracking.com/v2/states/ny/daily/simple.json'
