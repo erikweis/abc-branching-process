@@ -5,7 +5,7 @@ import sys
 import pandas as pd
 import argparse
 import subprocess
-import tqdm
+from tqdm import tqdm
 
 from priors import priors
 
