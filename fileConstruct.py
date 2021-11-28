@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import json
 import sys
@@ -20,7 +21,7 @@ class WriteFiles:
             A_k=.1,
             B_k=.5,
             error=1, 
-            trials=100):
+            num_trials=100):
         self.A_R0 = A_R0
         self.B_R0 = B_R0
         self.A_k = A_k
@@ -46,13 +47,15 @@ class WriteFiles:
         
         r0List = []
         kList = []
-        for i in range(trials):
-            R0, k = priors(A_R0, B_R0, A_k, B_k)
+        rList = []
+        for i in range(num_trials):
+            R0, k, r = priors(A_R0, B_R0, A_k, B_k)
             r0List.append(R0)
-            kList.append(k)            
+            kList.append(k)
+            rList.append(r)
             
             
-        paramDF = pd.DataFrame(list(zip(r0List, kList)), columns = ['R0', 'k'])
+        paramDF = pd.DataFrame(list(zip(r0List, kList, rList)), columns = ['R0', 'k', 'recovery'])
         
         
         paramDF.to_csv('trials.csv')
@@ -61,14 +64,16 @@ class WriteFiles:
         
         
 if __name__=='__main__':
+    
+    
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_trials', typer = int , help = 'number of simulation runs')
+    parser.add_argument('--num_trials', type = int , help = 'number of simulation runs')
     
-    
+
     args = parser.parse_args()
     
-    trials = args.trials
-    WriteFile(trials = trials)
+    num_trials = args.num_trials
+    WriteFiles(num_trials = num_trials)
     
         
 
