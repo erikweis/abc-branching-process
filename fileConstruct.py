@@ -18,9 +18,9 @@ class WriteFiles:
             foldername=None,
             cutoff_time=90,
             A_R0=1,
-            B_R0=4,
+            B_R0=10,
             A_k=.1,
-            B_k=.5,
+            B_k=1,
             error=1, 
             num_trials=100):
         self.A_R0 = A_R0
