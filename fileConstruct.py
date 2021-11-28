@@ -55,11 +55,12 @@ class WriteFiles:
             
         #save csv
         paramDF = pd.DataFrame(list(zip(r0List, kList, rList)), columns = ['R0', 'k', 'recovery'])
-        paramDF.to_csv('trials.csv')
+        trials_fpath = os.path.join(self.dirpath,'trials.csv')
+        paramDF.to_csv(trials_fpath)
         self.paramDF = paramDF
     
 
-    def get_bash_script(fpath,r0,k,r):
+    def get_bash_script(self,fpath,r0,k,r):
 
         return f"""#!/bin/bash
             #SBATCH --partition=short
@@ -72,16 +73,16 @@ class WriteFiles:
 
         
     def submit_all_jobs(self):
-
         
-        for index, vals in self.paramDF.to_numpy():
+        for index, vals in enumerate(self.paramDF.to_numpy()):
 
             r0,k,r = vals
             trial_fpath = os.path.join(self.dirpath, f'trial_{index}.csv')
 
             script = self.get_bash_script(trial_fpath,r0,k,r)
-            subprocess([script],shell=True)
+            subprocess.call([script],shell=True)
         
+
 if __name__=='__main__':
     
     
@@ -92,7 +93,8 @@ if __name__=='__main__':
     args = parser.parse_args()
     
     num_trials = args.num_trials
-    WriteFiles(num_trials = num_trials)
+    wf = WriteFiles(num_trials = num_trials)
+    wf.submit_all_jobs()
     
         
 
