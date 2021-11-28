@@ -76,7 +76,8 @@ if __name__ == "__main__":
     
     #specify a foldername
     #foldername = '11-28_16-13-31' #100 with wide prior tight confidence (0.5)
-    foldername = '11-28_15-39-40' #1000 with wide priors
+    #foldername = '11-28_15-39-40' #1000 with wide priors
+    foldername = '11-28_17-58-26'
 
     #if no foldername specified, use the most recent dated folder
     if not foldername:
@@ -89,5 +90,7 @@ if __name__ == "__main__":
 
     #make pairplot
     #print(abca.number_successful_trials())
-    abca.plot_results()
+    #abca.plot_results()
+    df = abca.df[abca.df['trial_success']==1]
+    print(df.head())
     #abca.pairplot_R0_k()
