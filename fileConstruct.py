@@ -5,6 +5,7 @@ import sys
 import pandas as pd
 import argparse
 import subprocess
+import tqdm
 
 from priors import priors
 
@@ -66,14 +67,14 @@ class WriteFiles:
             #SBATCH --partition=short
             #SBATCH --nodes=1
             #SBATCH --mem=1gb
-            #SBATCH --time=00:09:59
+            #SBATCH --time=00:04:59
             #SBATCH --job-name=1997
             python discretebranchingprocess.py -f {fpath} -r0 {r0} -k {k} -r {r}"""
 
         
     def submit_all_jobs(self):
         
-        for index, vals in enumerate(self.paramDF.to_numpy()):
+        for index, vals in tqdm(enumerate(self.paramDF.to_numpy())):
 
             r0,k,r = vals
             trial_fpath = os.path.join(self.dirpath, f'trial_{index}.csv')
@@ -92,7 +93,7 @@ if __name__=='__main__':
     args = parser.parse_args()
     
     num_trials = args.num_trials
-    wf = WriteFiles(num_trials = num_trials)
+    wf = WriteFiles(num_trials = num_trials,error=0.5)
     wf.submit_all_jobs()
     
         

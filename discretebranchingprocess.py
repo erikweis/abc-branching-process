@@ -16,12 +16,12 @@ def neg_binom_pull(r0, k):
 def binom_pull(r, infect_count):
     return np.random.binomial(infect_count, 1 - r)
 
-def simulation_within_threshold(cumulative_cases_simulated, cumulative_cases_data):
+def simulation_within_threshold(cumulative_cases_simulated, cumulative_cases_data,threshold=0.5):
 
     """Returns true if the simulation is within threshold and False if the simulation should stop."""
 
     error = np.abs(cumulative_cases_simulated - cumulative_cases_data) / cumulative_cases_data
-    return error <= 1
+    return error <= threshold
 
 
 def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time = None):

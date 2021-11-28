@@ -43,13 +43,12 @@ class ABCAnalysis:
 
 
     def plot_priors(self):
-
-        x = 
+        pass
 
 if __name__ == "__main__":
     
     #specify a foldername
-    foldername = '11-28_11-44-20'
+    foldername = '11-28_15-39-40'
 
     #if no foldername specified, use the most recent dated folder
     if not foldername:
@@ -61,4 +60,5 @@ if __name__ == "__main__":
     abca = ABCAnalysis(foldername)
 
     #make pairplot
+    print(abca.number_successful_trials())
     abca.pairplot_R0_k()
