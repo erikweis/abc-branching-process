@@ -1,5 +1,15 @@
 import argparse
 
+def get_bash_script(fpath,r0,k,r):
+
+    return f"""#!/bin/bash
+        #SBATCH --partition=short
+        #SBATCH --nodes=1
+        #SBATCH --mem=1gb
+        #SBATCH --time=02:59:59
+        #SBATCH --job-name=1997
+
+        python discretebranchingprocess.py -f {fpath} -r0 {r0} -k {k} -r {r}"""
 
 if __name__=="__main__":
 

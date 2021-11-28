@@ -3,7 +3,8 @@ import os
 import json
 import sys
 import pandas as pd
-import argparse 
+import argparse
+import subprocess
 
 from priors import priors
 
@@ -43,8 +44,6 @@ class WriteFiles:
             json.dump(hyperparams, f)
 
         #pull R0 and k for files
-
-        
         r0List = []
         kList = []
         rList = []
@@ -54,14 +53,34 @@ class WriteFiles:
             kList.append(k)
             rList.append(r)
             
-            
+        #save csv
         paramDF = pd.DataFrame(list(zip(r0List, kList, rList)), columns = ['R0', 'k', 'recovery'])
-        
-        
         paramDF.to_csv('trials.csv')
-        trial_fpath = os.path.join(self.dirpath, 'trial.csv')
+        self.paramDF = paramDF
+    
+
+    def get_bash_script(fpath,r0,k,r):
+
+        return f"""#!/bin/bash
+            #SBATCH --partition=short
+            #SBATCH --nodes=1
+            #SBATCH --mem=1gb
+            #SBATCH --time=02:59:59
+            #SBATCH --job-name=1997
+
+            python discretebranchingprocess.py -f {fpath} -r0 {r0} -k {k} -r {r}"""
+
         
+    def submit_all_jobs(self):
+
         
+        for index, vals in self.paramDF.to_numpy():
+
+            r0,k,r = vals
+            trial_fpath = os.path.join(self.dirpath, f'trial_{index}.csv')
+
+            script = self.get_bash_script(trial_fpath,r0,k,r)
+            subprocess([script],shell=True)
         
 if __name__=='__main__':
     
