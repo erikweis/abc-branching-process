@@ -57,14 +57,11 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time 
         infect_vec[i] = trans_vec[i] + binom_pull(r, infect_vec[i - 1])
 
         # Check the values here for the ABC
-        checkpoints = [15, 30, 45, 60, 75, 90]
+        checkpoints = [7, 14, 21, 28, 35, 42]
 
-        if i == 45:
-            print("Halfway")
         if i in checkpoints:
             if not simulation_within_threshold(np.sum(trans_vec), cumulative_cases_data[i]):
                 return f"Failure at {i}"
-
 
     #calculate cumulative_cases
     cumulative_cases_simulated = [int(np.sum(trans_vec[0:i]) + 1) for i in range(1,cutoff_time)] #add 1 for initial case
