@@ -46,6 +46,9 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time 
     trans_vec = np.zeros(cutoff_time)
     infect_vec = np.zeros(cutoff_time)
 
+    # Check the values here for the ABC
+    checkpoints = np.arange(10,cutoff_time)
+
     infect_vec[0] = 1
     for i in range(1, cutoff_time):
 
@@ -56,8 +59,7 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time 
         trans_vec[i] = temp
         infect_vec[i] = trans_vec[i] + binom_pull(r, infect_vec[i - 1])
 
-        # Check the values here for the ABC
-        checkpoints = [7, 14, 21, 28, 35, 42]
+        
 
         if i in checkpoints:
             if not simulation_within_threshold(np.sum(trans_vec), cumulative_cases_data[i]):
