@@ -55,7 +55,7 @@ class ABCAnalysis:
             df = self.df[self.df['trial_success']==1]
         else:
             df = self.df
-        sns.pairplot(df,vars=['R0','k','recovery'])
+        sns.pairplot(df,vars=['R0','k','recovery'],bins=20)
         plt.show()
 
     def jointplot_R0_k(self,successful_trials_only=True):
