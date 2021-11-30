@@ -6,7 +6,7 @@ def submit(args):
     
 
     script = f'/usr/bin/sbatch'
-    script += f'--export=ALL,NUMTRIALS={args.num_trials},STATE={args.state},ERROR={args.error},FOLDERNAME={args.foldername}'
+    script += f'--export=ALL,NUM_TRIALS={args.num_trials},STATE={args.state},ERROR={args.error},FOLDERNAME={args.foldername}'
     script += f"""#!/bin/bash
             #SBATCH --partition=short
             #SBATCH --nodes=1
@@ -14,7 +14,7 @@ def submit(args):
             #SBATCH --time=0:20:00
             #SBATCH --job-name=1997
             """
-    script += """python submitter_all_python.py --num_trials $NUMTRIALS --state $STATE --error $ERROR --foldername $FOLDERNAME"""
+    script += """python submitter_all_python.py --num_trials $NUM_TRIALS --state $STATE --error $ERROR --foldername $FOLDERNAME"""
 
     subprocess.call([script],shell=True)
 
