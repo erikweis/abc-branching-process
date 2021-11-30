@@ -23,7 +23,7 @@ class ABCAnalysis:
         #hard code state for now
         self.state = 'vt'
         data_path = os.path.join('data',f'{self.state}_first_peak.csv')
-        self.cumulative_cases_data = pd.read_csv(data_path).values
+        self.cumulative_cases_data = pd.read_csv(data_path).values[:,1]
 
     def number_successful_trials(self):
         return sum(self.df['trial_success'])
@@ -34,14 +34,18 @@ class ABCAnalysis:
         trial_ID = int(row['Unnamed: 0'])
         path = os.path.join(self.dirpath,f'trial_{trial_ID}.csv')
 
-        with open(path,'r') as f:
-            text = f.read()
-            if text.startswith('Failure'):
-                print(text)
-                return 0
-            else:
-                return 1
+        try:
+            with open(path,'r') as f:
+                text = f.read()
+                if text.startswith('Failure'):
+                    return 0
+                else:
+                    return 1
+        except:
+            return 0
 
+    def plot_distribution_failures(self):
+        pass
 
     def pairplot_R0_k(self,successful_trials_only = True):
 
@@ -51,9 +55,17 @@ class ABCAnalysis:
             df = self.df[self.df['trial_success']==1]
         else:
             df = self.df
-        sns.pairplot(df,vars=['R0','k'])
+        sns.pairplot(df,vars=['R0','k','recovery'],bins=20)
         plt.show()
 
+    def jointplot_R0_k(self,successful_trials_only=True):
+
+        if successful_trials_only:
+            df = self.df[self.df['trial_success']==1]
+        else:
+            df = self.df
+        sns.jointplot(data=df,x='R0',y='k')
+        plt.show()
 
     def plot_priors(self):
         pass
@@ -68,6 +80,7 @@ class ABCAnalysis:
                 vals = temp_df['cumulative_cases_simulated'].values
                 plt.plot(vals,color='blue',alpha=0.1)
 
+        print(self.cumulative_cases_data)
         plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
         plt.show()
 
@@ -77,7 +90,9 @@ if __name__ == "__main__":
     #specify a foldername
     #foldername = '11-28_16-13-31' #100 with wide prior tight confidence (0.5)
     #foldername = '11-28_15-39-40' #1000 with wide priors
-    foldername = '11-28_17-58-26'
+    #foldername = '11-28_17-58-26'
+    #foldername = '11-28_18-35-31' #100 with normal priors
+    foldername = ''
 
     #if no foldername specified, use the most recent dated folder
     if not foldername:
@@ -87,10 +102,13 @@ if __name__ == "__main__":
 
     #create analysis object with foldername
     abca = ABCAnalysis(foldername)
+    print(abca.number_successful_trials())
 
     #make pairplot
     #print(abca.number_successful_trials())
     #abca.plot_results()
     df = abca.df[abca.df['trial_success']==1]
     print(df.head())
-    #abca.pairplot_R0_k()
+    abca.pairplot_R0_k()
+    abca.jointplot_R0_k()
+    abca.plot_results()

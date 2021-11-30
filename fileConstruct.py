@@ -87,7 +87,7 @@ if __name__=='__main__':
     
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_trials', type = int , help = 'number of simulation runs')
+    parser.add_argument('--num_trials', type = int , default = 100, help = 'number of simulation runs')
     
 
     args = parser.parse_args()
