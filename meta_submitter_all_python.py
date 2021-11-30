@@ -3,13 +3,19 @@ import subprocess
 
 def submit(args):
 
-    script = f"""#!/bin/bash
+    
+
+    script = f'/usr/bin/sbatch'
+    script += f'--export=ALL,NUMTRIALS={args.num_trials},STATE={args.state},ERROR={args.error},INPUTDIR={args.foldername}'
+    script += f"""#!/bin/bash
             #SBATCH --partition=short
             #SBATCH --nodes=1
             #SBATCH --mem=2gb
             #SBATCH --time=0:20:00
             #SBATCH --job-name=1997
-            python submitter_all_python.py --num_trials {args.num_trials} --state {args.state} --error {args.error} --foldername {args.foldername}"""
+            """
+    script += """python submitter_all_python.py --num_trials $NUMTRIALS --state $STATE --error $ERROR --foldername $FOLDERNAME"""
+
     subprocess.call([script],shell=True)
 
 
@@ -23,5 +29,3 @@ if __name__=='__main__':
 
     args = parser.parse_args()
     submit(args)
-
-    
