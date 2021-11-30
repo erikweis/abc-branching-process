@@ -26,7 +26,7 @@ class WriteFiles:
         self.foldername = foldername
 
         #get output directory
-        dirname = datetime.now().strftime("%m-%d_%H-%M-%S") if foldername is None else foldername
+        dirname = datetime.now().strftime("%m-%d_%H-%M-%S") if not foldername else foldername
         self.dirpath = os.path.join('simulations', dirname)
         os.mkdir(self.dirpath)
 
@@ -77,9 +77,10 @@ if __name__=='__main__':
     parser.add_argument('--num_trials', type = int , default = 100, help = 'number of simulation runs')
     parser.add_argument('--state',default='vt')
     parser.add_argument('--error',default=0.5,help='the maximum error for simulation when checking against real data')
-    parser.add_argument('--foldername',default=None,help='custom foldername')
+    parser.add_argument('--foldername',default='',help='custom foldername')
 
     args = parser.parse_args()
+    assert isinstance(args.error,float)
     
     wf = WriteFiles(num_trials = args.num_trials,error=args.error,state=args.state,foldername = args.foldername)
     wf.submit_all_jobs()
