@@ -1,7 +1,7 @@
 import argparse
 import subprocess
 
-def submit(self,args):
+def submit(args):
 
     script = f"""#!/bin/bash
             #SBATCH --partition=short
