@@ -6,7 +6,7 @@ def submit(args):
     
 
     script = f'/usr/bin/sbatch'
-    script += f'--export=ALL,NUMTRIALS={args.num_trials},STATE={args.state},ERROR={args.error},INPUTDIR={args.foldername}'
+    script += f'--export=ALL,NUMTRIALS={args.num_trials},STATE={args.state},ERROR={args.error},FOLDERNAME={args.foldername}'
     script += f"""#!/bin/bash
             #SBATCH --partition=short
             #SBATCH --nodes=1
