@@ -24,7 +24,7 @@ def simulation_within_threshold(cumulative_cases_simulated, cumulative_cases_dat
     return error <= threshold
 
 
-def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time = None):
+def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time = None,threshold=0.5):
 
     """ Simulate a branching process with {cutoff_time} steps,
     according to parameters R0 and K, drawn from prior beta
@@ -57,32 +57,27 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time 
             temp = temp + neg_binom_pull(r0, k)
 
         trans_vec[i] = temp
-        infect_vec[i] = trans_vec[i] + binom_pull(r, infect_vec[i - 1])
-
-        
+        infect_vec[i] = trans_vec[i] + binom_pull(r, infect_vec[i - 1])        
 
         if i in checkpoints:
-            if not simulation_within_threshold(np.sum(trans_vec), cumulative_cases_data[i]):
+            if not simulation_within_threshold(np.sum(trans_vec), cumulative_cases_data[i],threshold):
                 return f"Failure at {i}"
 
     #calculate cumulative_cases
     cumulative_cases_simulated = [int(np.sum(trans_vec[0:i]) + 1) for i in range(1,cutoff_time)] #add 1 for initial case
     return cumulative_cases_simulated        
-        
 
-if __name__ == "__main__":
 
-    # setup arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-f',type=str,help='filename to save the output')
-    parser.add_argument('-r0',type=float,default = 3.5, help='expected secondary infections parameter for negative binomial distribution')
-    parser.add_argument('-k',type= float,default = 0.5, help='dispersion parameter for negative binomial')
-    parser.add_argument('-r',type=float,default = 0.01, help='carry-over infections proportion at each time step')
-    parser.add_argument('--cutoff',default = -1, type=int,help='stop simualtion after N steps')
-    parser.add_argument('--state',default='vt')
+def save_data(output,filepath):
 
-    args = parser.parse_args()
+    if isinstance(output,str):
+        with open(filepath,'w') as f: 
+            f.write(output)
+    else:
+        df = pd.DataFrame(output,columns = ['cumulative_cases_simulated'])
+        df.to_csv(filepath)
 
+def main(args):
 
     if not args.f:
         print("No file name called")
@@ -94,32 +89,26 @@ if __name__ == "__main__":
         k = args.k,
         r = args.r,
         cutoff_time = cutoff_time,
-        state = args.state
+        state = args.state,
+        error = args.error
     )
 
-    if isinstance(output,str):
-        with open(args.f,'w') as f: 
-            f.write(output)
-    else:
-        df = pd.DataFrame(output,columns = ['cumulative_cases_simulated'])
-        df.to_csv(args.f)
-        
+    save_data(output,args.f)
 
 
+if __name__ == "__main__":
 
-    # url = 'https://api.covidtracking.com/v2/states/ny/daily/simple.json'
-    # out = requests.get(url).json()
-    # data = out['data'][::-1]
-    # cutoff_time = 20
-    # cumulative_cases_data = [d['cases']['total'] for d in data[:cutoff_time]]
+    # setup arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f',type=str,help='filename to save the output')
+    parser.add_argument('-r0',type=float,default = 3.5, help='expected secondary infections parameter for negative binomial distribution')
+    parser.add_argument('-k',type= float,default = 0.5, help='dispersion parameter for negative binomial')
+    parser.add_argument('-r',type=float,default = 0.01, help='carry-over infections proportion at each time step')
+    parser.add_argument('--cutoff',default = -1, type=int,help='stop simualtion after N steps')
+    parser.add_argument('--state',default='vt')
+    parser.add_argument('--error',default=0.5,help='the maximum error for simulation when checking against real data')
 
+    args = parser.parse_args()
 
-    
-
-    # sampR0, sampK, cumulative_cases_simulated  = simulate_branching_process(cumulative_cases_data, T, 1, 4, .1, .5)
-
-    # print("k:",sampK)
-    # print("R0:", sampR0)
-    # print(cumulative_cases_simulated)
-
+    main(args)
 

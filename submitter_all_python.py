@@ -7,7 +7,8 @@ import argparse
 import subprocess
 from tqdm import tqdm
 
-from priors import priors
+from priors import normal_priors
+from discretebranchingprocess import simulate_branching_process, save_data
 
 class WriteFiles:
     """Class to write the files for the trials and parameters.
@@ -17,29 +18,20 @@ class WriteFiles:
             self,
             state='vt',
             foldername=None,
-            cutoff_time=90,
-            A_R0=1,
-            B_R0=10,
-            A_k=.1,
-            B_k=1,
             error=1, 
             num_trials=100):
-        self.A_R0 = A_R0
-        self.B_R0 = B_R0
-        self.A_k = A_k
-        self.B_k = B_k
+
         self.error = error
-        self.cutoff_time = cutoff_time
-        #self.cumulative_cases_data = pd.read_csv(f'data/{state}_first_peak.csv').values
+        self.state = state
+        self.foldername = foldername
 
-
-
+        #get output directory
         dirname = datetime.now().strftime("%m-%d_%H-%M-%S") if foldername is None else foldername
         self.dirpath = os.path.join('simulations', dirname)
         os.mkdir(self.dirpath)
 
-        # save hyperparams to a json file
-        hyperparams = {'A_R0': A_R0, 'B_R0': B_R0, 'A_k': A_k, 'B_k': B_k}
+        # save run params to a json file
+        hyperparams = dict(state=state,error=error,num_trials=num_trials)
         json_fpath = os.path.join(self.dirpath, 'hyperparams.json')
         with open(json_fpath, 'w') as f:
             json.dump(hyperparams, f)
@@ -49,7 +41,7 @@ class WriteFiles:
         kList = []
         rList = []
         for i in range(num_trials):
-            R0, k, r = priors(A_R0, B_R0, A_k, B_k)
+            R0, k, r = normal_priors()
             r0List.append(R0)
             kList.append(k)
             rList.append(r)
@@ -60,16 +52,22 @@ class WriteFiles:
         paramDF.to_csv(trials_fpath)
         self.paramDF = paramDF
     
+
+    def get_bash_script(self,fpath,r0,k,r):
+
+        return f"""python discretebranchingprocess.py -f {fpath} -r0 {r0} -k {k} -r {r}"""
+
         
     def submit_all_jobs(self):
         
         for index, vals in tqdm(enumerate(self.paramDF.to_numpy())):
 
             r0,k,r = vals
-            trial_fpath = os.path.join(self.dirpath, f'trial_{index}.csv')
 
-            script = self.get_bash_script(trial_fpath,r0,k,r)
-            subprocess.call([script],shell=True)
+            output = simulate_branching_process(r0,k,r,self.state,threshold = self.error)
+
+            trial_fpath = os.path.join(self.dirpath, f'trial_{index}.csv')
+            save_data(output,trial_fpath)
         
 
 if __name__=='__main__':
@@ -77,12 +75,13 @@ if __name__=='__main__':
     
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_trials', type = int , default = 100, help = 'number of simulation runs')
-    
+    parser.add_argument('--state',default='vt')
+    parser.add_argument('--error',default=0.5,help='the maximum error for simulation when checking against real data')
+    parser.add_argument('--foldername',default=None,help='custom foldername')
 
     args = parser.parse_args()
     
-    num_trials = args.num_trials
-    wf = WriteFiles(num_trials = num_trials,error=0.5)
+    wf = WriteFiles(num_trials = args.num_trials,error=args.error,state=args.state,foldername = args.foldername)
     wf.submit_all_jobs()
     
         
