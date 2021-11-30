@@ -3,11 +3,9 @@ import subprocess
 
 def submit(args):
 
-    
-
     script = f'/usr/bin/sbatch'
-    script += f'--export=ALL,NUM_TRIALS={args.num_trials},STATE={args.state},ERROR={args.error},FOLDERNAME={args.foldername}'
-    script += 'subscript.sbatch'
+    script += f' --export=ALL,NUM_TRIALS={args.num_trials},STATE={args.state},ERROR={args.error},FOLDERNAME={args.foldername}'
+    script += ' subscript.sbatch'
     subprocess.call([script],shell=True)
 
 
