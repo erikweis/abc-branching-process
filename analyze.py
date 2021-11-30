@@ -55,7 +55,7 @@ class ABCAnalysis:
             df = self.df[self.df['trial_success']==1]
         else:
             df = self.df
-        sns.pairplot(df,vars=['R0','k','recovery'],bins=20)
+        sns.pairplot(df,vars=['R0','k','recovery'],diag_kws=dict(bins=20))
         plt.show()
 
     def jointplot_R0_k(self,successful_trials_only=True):
@@ -110,5 +110,5 @@ if __name__ == "__main__":
     df = abca.df[abca.df['trial_success']==1]
     print(df.head())
     abca.pairplot_R0_k()
-    abca.jointplot_R0_k()
-    abca.plot_results()
+    #abca.jointplot_R0_k()
+    #abca.plot_results()
