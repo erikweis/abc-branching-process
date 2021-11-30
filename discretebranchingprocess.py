@@ -90,7 +90,7 @@ def main(args):
         r = args.r,
         cutoff_time = cutoff_time,
         state = args.state,
-        error = args.error
+        threshold = args.error
     )
 
     save_data(output,args.f)
