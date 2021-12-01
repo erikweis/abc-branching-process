@@ -60,14 +60,17 @@ class WriteFiles:
         
     def submit_all_jobs(self):
         
-        for index, vals in tqdm(enumerate(self.paramDF.to_numpy())):
+        for index, vals in enumerate(self.paramDF.to_numpy()):
 
-            r0,k,r = vals
+            try:
+                r0,k,r = vals
+                output = simulate_branching_process(r0,k,r,self.state,threshold = self.error)
 
-            output = simulate_branching_process(r0,k,r,self.state,threshold = self.error)
-
-            trial_fpath = os.path.join(self.dirpath, f'trial_{index}.csv')
-            save_data(output,trial_fpath)
+                trial_fpath = os.path.join(self.dirpath, f'trial_{index}.csv')
+                save_data(output,trial_fpath)
+                print(f"trial {index} ran successfully")
+            except:
+                print(f"trial {index} failed")
         
 
 if __name__=='__main__':
