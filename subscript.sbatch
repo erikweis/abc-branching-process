@@ -3,7 +3,7 @@
 #SBATCH --partition=short
 #SBATCH --nodes=1
 #SBATCH --mem=2gb
-#SBATCH --time=0:20:00
+#SBATCH --time=3:00:00
 #SBATCH --job-name=1997
 
 
