@@ -53,7 +53,7 @@ class WriteFiles:
         paramDF.to_csv(trials_fpath)
         self.paramDF = paramDF
     
-        print("finished initialization of WriteFiles object.")
+        logging.info("finished initialization of WriteFiles object.")
 
     # def get_bash_script(self,fpath,r0,k,r):
 
@@ -73,9 +73,12 @@ class WriteFiles:
 
                 trial_fpath = os.path.join(self.dirpath, f'trial_{index}.csv')
                 save_data(output,trial_fpath)
-                print(f"trial {index} ran successfully")
+                logging.info(f"trial {index} ran successfully")
             except:
-                print(f"trial {index} failed")
+                logging.info(f"trial {index} failed")
+
+        logging.info("finished all jobs")
+        sys.exit()
         
 
 if __name__=='__main__':
