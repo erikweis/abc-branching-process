@@ -7,6 +7,7 @@ import argparse
 import subprocess
 from tqdm import tqdm
 import logging
+from datetime import datetime
 
 from priors import normal_priors
 from discretebranchingprocess import simulate_branching_process, save_data
@@ -66,14 +67,13 @@ class WriteFiles:
         for index, vals in enumerate(self.paramDF.to_numpy()):
             
             if index%10==0:
-                print(f"trial {index}")
+                logging.info(f"starting trial {100} at {datetime.now()}")
             try:
                 r0,k,r = vals
                 output = simulate_branching_process(r0,k,r,self.state,threshold = self.error)
 
                 trial_fpath = os.path.join(self.dirpath, f'trial_{index}.csv')
                 save_data(output,trial_fpath)
-                logging.info(f"trial {index} ran successfully")
             except:
                 logging.info(f"trial {index} failed")
 
