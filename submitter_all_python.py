@@ -52,6 +52,7 @@ class WriteFiles:
         paramDF.to_csv(trials_fpath)
         self.paramDF = paramDF
     
+        print("finished initialization of WriteFiles object.")
 
     # def get_bash_script(self,fpath,r0,k,r):
 
@@ -87,6 +88,8 @@ if __name__=='__main__':
 
     args = parser.parse_args()
     
+    print("starting trials")
+
     wf = WriteFiles(num_trials = args.num_trials,error=args.error,state=args.state,foldername = args.foldername)
     wf.submit_all_jobs()
     
