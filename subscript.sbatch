@@ -6,5 +6,5 @@
 #SBATCH --time=3:00:00
 #SBATCH --job-name=1997
 
-
+echo $NUM_TRIALS
 python submitter_all_python.py --num_trials $NUM_TRIALS --state $STATE --error $ERROR --foldername $FOLDERNAME
