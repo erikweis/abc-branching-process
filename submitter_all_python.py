@@ -60,8 +60,11 @@ class WriteFiles:
         
     def submit_all_jobs(self):
         
+        print("in job submitter")
         for index, vals in enumerate(self.paramDF.to_numpy()):
-
+            
+            if index%10==0:
+                print(f"trial {index}")
             try:
                 r0,k,r = vals
                 output = simulate_branching_process(r0,k,r,self.state,threshold = self.error)
