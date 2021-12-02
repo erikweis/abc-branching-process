@@ -6,6 +6,7 @@ import pandas as pd
 import argparse
 import subprocess
 from tqdm import tqdm
+import logging
 
 from priors import normal_priors
 from discretebranchingprocess import simulate_branching_process, save_data
@@ -88,7 +89,7 @@ if __name__=='__main__':
 
     args = parser.parse_args()
     
-    print("starting trials")
+    logging.info("starting trials")
 
     wf = WriteFiles(num_trials = args.num_trials,error=args.error,state=args.state,foldername = args.foldername)
     wf.submit_all_jobs()
