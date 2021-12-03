@@ -8,6 +8,9 @@ import sys
 import argparse
 from typing import Iterable
 
+import logging
+import timeit
+
 def neg_binom_pull(r0, k):
     p = r0 / (r0 + k)
     n = 1/k
@@ -37,6 +40,7 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time 
         R0,k,simulated_cumulative_cases[tuple]: The sampled parameters R0, k, and the cumulative cases.
         Returns -99 for simulated_cumulative_cases if the procedure failed one of the threshold checks.
     """
+    start = timeit.timeit()
 
     cumulative_cases_data= pd.read_csv(f'data/{state}_first_peak.csv').values[:,1]
 
@@ -65,6 +69,10 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time 
 
     #calculate cumulative_cases
     cumulative_cases_simulated = [int(np.sum(trans_vec[0:i]) + 1) for i in range(1,cutoff_time)] #add 1 for initial case
+
+    end = timeit.timeit()
+    logging.info(end-start)
+
     return cumulative_cases_simulated        
 
 
