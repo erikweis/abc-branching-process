@@ -66,6 +66,9 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time 
         if i in checkpoints:
             if not simulation_within_threshold(np.sum(trans_vec), cumulative_cases_data[i],threshold):
                 return f"Failure at {i}"
+        elif i<min(checkpoints) and np.sum(trans_vec)>max(cumulative_cases_data)/2:
+            #double check the branching process isn't going crazy right away
+            return f"Failuer at {i}"
 
     #calculate cumulative_cases
     cumulative_cases_simulated = [int(np.sum(trans_vec[0:i]) + 1) for i in range(1,cutoff_time)] #add 1 for initial case
