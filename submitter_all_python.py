@@ -38,6 +38,8 @@ class WriteFiles:
         with open(json_fpath, 'w') as f:
             json.dump(hyperparams, f)
 
+        logging.info('started making priors')
+
         #pull R0 and k for files
         r0List = []
         kList = []
@@ -47,7 +49,9 @@ class WriteFiles:
             r0List.append(R0)
             kList.append(k)
             rList.append(r)
-            
+        
+        logging.info('finished making priors')
+
         #save csv
         paramDF = pd.DataFrame(list(zip(r0List, kList, rList)), columns = ['R0', 'k', 'recovery'])
         trials_fpath = os.path.join(self.dirpath,'trials.csv')
@@ -67,7 +71,7 @@ class WriteFiles:
         for index, vals in enumerate(self.paramDF.to_numpy()):
             
             if index%10==0:
-                logging.info(f"starting trial {100} at {datetime.now()}")
+                logging.info(f"starting trial {index} at {datetime.now()}")
             try:
                 r0,k,r = vals
                 output = simulate_branching_process(r0,k,r,self.state,threshold = self.error)
@@ -83,7 +87,6 @@ class WriteFiles:
 
 if __name__=='__main__':
     
-    
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_trials', type = int , default = 100, help = 'number of simulation runs')
     parser.add_argument('--state',default='vt')
@@ -92,6 +95,7 @@ if __name__=='__main__':
 
     args = parser.parse_args()
     
+    logging.basicConfig(format='%(asctime)s %(message)s',level=logging.INFO)
     logging.info("starting trials")
 
     wf = WriteFiles(num_trials = args.num_trials,error=args.error,state=args.state,foldername = args.foldername)
