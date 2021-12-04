@@ -60,11 +60,7 @@ class WriteFiles:
     
         logging.info("finished initialization of WriteFiles object.")
 
-    # def get_bash_script(self,fpath,r0,k,r):
 
-    #     return f"""python discretebranchingprocess.py -f {fpath} -r0 {r0} -k {k} -r {r}"""
-
-        
     def submit_all_jobs(self):
         
         print("in job submitter")

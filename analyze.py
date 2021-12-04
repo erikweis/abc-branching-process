@@ -88,10 +88,6 @@ class ABCAnalysis:
 if __name__ == "__main__":
     
     #specify a foldername
-    #foldername = '11-28_16-13-31' #100 with wide prior tight confidence (0.5)
-    #foldername = '11-28_15-39-40' #1000 with wide priors
-    #foldername = '11-28_17-58-26'
-    #foldername = '11-28_18-35-31' #100 with normal priors
     foldername = ''
 
     #if no foldername specified, use the most recent dated folder
