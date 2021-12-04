@@ -7,13 +7,11 @@ import json
 
 class ABCAnalysis:
 
-    def __init__(self,foldername):
+    def __init__(self,foldername,state='vt'):
 
         self.dirpath = os.path.join('simulations',foldername)
         csv_path = os.path.join(self.dirpath,'trials.csv')
         self.df = pd.read_csv(csv_path)
-
-        self.df['trial_success'] = self.df.apply(self.determine_trial_success,axis=1)
 
         #load params
         with open(os.path.join(self.dirpath,'hyperparams.json')) as f:
@@ -21,7 +19,7 @@ class ABCAnalysis:
                 self.__setattr__(k,v)
 
         #hard code state for now
-        self.state = 'vt'
+        self.state = state
         data_path = os.path.join('data',f'{self.state}_first_peak.csv')
         self.cumulative_cases_data = pd.read_csv(data_path).values[:,1]
 
@@ -32,7 +30,7 @@ class ABCAnalysis:
     def determine_trial_success(self,row):
 
         trial_ID = int(row['Unnamed: 0'])
-        path = os.path.join(self.dirpath,f'trial_{trial_ID}.csv')
+        path = os.path.join(self.dirpath,f'trial_{trial_ID}.csv'    )
 
         try:
             with open(path,'r') as f:
@@ -51,19 +49,15 @@ class ABCAnalysis:
 
         """Pairplot of R0 and k"""
 
-        if successful_trials_only:
-            df = self.df[self.df['trial_success']==1]
-        else:
-            df = self.df
+        df = self.successful_trials_df if successful_trials_only else self.df
+
         sns.pairplot(df,vars=['R0','k','recovery'],diag_kws=dict(bins=20))
         plt.show()
 
     def jointplot_R0_k(self,successful_trials_only=True):
 
-        if successful_trials_only:
-            df = self.df[self.df['trial_success']==1]
-        else:
-            df = self.df
+        df = self.successful_trials_df if successful_trials_only else self.df
+
         sns.jointplot(data=df,x='R0',y='k')
         plt.show()
 
@@ -83,6 +77,19 @@ class ABCAnalysis:
         print(self.cumulative_cases_data)
         plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
         plt.show()
+
+    @property
+    def successful_trials_df(self):
+        
+        if not hasattr(self,'_successful_trials_df'):
+            fpath = os.path.join(self.dirpath,'successful_trials.csv')
+            if os.path.isfile(fpath):
+                self._successful_trials_df = pd.read_csv(fpath)
+            else:
+                self.df['trial_success'] = self.df.apply(self.determine_trial_success,axis=1)
+                self._successful_trials_df = self.df[self.df['trial_success']==1]
+                self._successful_trials_df.to_csv(fpath)
+        return self._successful_trials_df
 
 
 if __name__ == "__main__":
