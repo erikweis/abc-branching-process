@@ -24,7 +24,7 @@ class ABCAnalysis:
         self.cumulative_cases_data = pd.read_csv(data_path).values[:,1]
 
     def number_successful_trials(self):
-        return sum(self.df['trial_success'])
+        return len(self.successful_trials_df)
 
 
     def determine_trial_success(self,row):

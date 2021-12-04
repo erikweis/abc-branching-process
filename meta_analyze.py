@@ -14,6 +14,7 @@ class MetaABCAnalysis:
 
         folders = [f for f in os.listdir('simulations/') if f.startswith(folder_tag)]
         states = [f.split('_')[-1] for f in folders]
+        self.states = states
 
         self.abcas = []
         for f,s in tqdm(zip(folders,states)):
@@ -28,25 +29,28 @@ class MetaABCAnalysis:
 
         dfs = [abca.successful_trials_df for abca in self.abcas]
         
-        fig, axes = plt.subplots(2,2)
+        fig, axes = plt.subplots(1,3,figsize=(10,4))
         
-        for df in tqdm(dfs):
+        for df,state in tqdm(zip(dfs,self.states)):
 
-            r0_x = np.linspace(1,5,200)
-            k_x = np.linspace(0,5,200)
+            r0_x = np.linspace(0,2,200)
+            k_x = np.linspace(0,3,200)
             r_x = np.linspace(0,1,200)
 
             r0_y = gaussian_kde(df['R0']).pdf(r0_x)
             k_y = gaussian_kde(df['k']).pdf(k_x)
             r_y = gaussian_kde(df['recovery']).pdf(r_x)
 
-            axes[0][0].plot(r0_x,r0_y,color='steelblue',alpha=0.3)
-            axes[0][1].plot(k_x,k_y,color='steelblue',alpha=0.3)
-            axes[1][0].plot(r_x,r_y,color='steelblue',alpha=0.3)
+            color = 'red' if state.lower()=='vt' else 'steelblue'
+            alpha = 1 if state.lower() =='vt' else 0.3
+
+            axes[0].plot(r0_x,r0_y,color=color,alpha=alpha)
+            axes[1].plot(k_x,k_y,color=color,alpha=alpha)
+            axes[2].plot(r_x,r_y,color=color,alpha=alpha)
         
-        axes[0][0].set_title('r0')
-        axes[0][1].set_title('k')
-        axes[1][0].set_title('recovery')
+        axes[0].set_title('r0')
+        axes[1].set_title('k')
+        axes[2].set_title('recovery')
 
         fig.tight_layout()
 
@@ -66,9 +70,33 @@ class MetaABCAnalysis:
 
         plt.show()
 
+    def visualize_sample_counts(self):
+
+        num_successful_trials = [abca.number_successful_trials() for abca in self.abcas]
+        max_cumulative_cases = [max(abca.cumulative_cases_data) for abca in self.abcas]
+
+        plt.scatter(max_cumulative_cases,num_successful_trials)
+
+        for i, txt in enumerate(STATES):
+            plt.annotate(txt, ( max_cumulative_cases[i],num_successful_trials[i]))
+
+        plt.xscale('log')
+        plt.xlabel('Max Cumulative Cases')
+        plt.yscale('log')
+        plt.ylabel('Number of Accepted Samples')
+        plt.show()
+
+        # for abca, state in zip(self.abcas, self.states):
+        #     print(state,abca.number_successful_trials())
+
+
+
 
 if __name__ == "__main__":
 
     mabca = MetaABCAnalysis('state_sweep')
-    mabca.plot_posteriors()
+    mabca.visualize_sample_counts()
+    #mabca.plot_posteriors()
+
+
         
