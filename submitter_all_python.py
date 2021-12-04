@@ -28,7 +28,10 @@ class WriteFiles:
         self.foldername = foldername
 
         #get output directory
-        dirname = datetime.now().strftime("%m-%d_%H-%M-%S") # if (foldername is None or len(foldername)==0) else foldername
+        if not foldername:
+            dirname = datetime.now().strftime("%m-%d_%H-%M-%S") # if (foldername is None or len(foldername)==0) else foldername
+        else:
+            dirname = foldername
         self.dirpath = os.path.join('simulations', dirname)
         os.mkdir(self.dirpath)
 
