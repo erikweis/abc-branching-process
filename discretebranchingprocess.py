@@ -7,14 +7,24 @@ import os
 import sys
 import argparse
 from typing import Iterable
+import math
 
 import logging
 import timeit
 
 def neg_binom_pull(r0, k):
-    p = r0 / (r0 + k)
-    n = 1/k
-    return scipy.stats.nbinom.rvs(n, p)
+    
+    
+    probs = []
+    
+    for i in range(10):
+                
+        probs.append((math.gamma(i+k)/(math.factorial(i)*math.gamma(k)))*((r0)/(k+r0))**(i) * (k/(k + r0))**(k))
+                
+                
+    probs = probs/np.sum(probs)
+    
+    return  np.random.choice(np.arange(0, 10), p=probs)
 
 def binom_pull(r, infect_count):
     return np.random.binomial(infect_count, 1 - r)
