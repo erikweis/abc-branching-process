@@ -51,8 +51,16 @@ class ABCAnalysis:
 
         df = self.successful_trials_df if successful_trials_only else self.df
 
+        sns.pairplot(df,vars=['R0','k'],diag_kws=dict(bins=20))
+        plt.show()
+
+    def pairplot(self,successful_trials_only = True):
+
+        df = self.successful_trials_df if successful_trials_only else self.df
+
         sns.pairplot(df,vars=['R0','k','recovery'],diag_kws=dict(bins=20))
         plt.show()
+        
 
     def jointplot_R0_k(self,successful_trials_only=True):
 
@@ -66,13 +74,18 @@ class ABCAnalysis:
 
     def plot_results(self):
 
-        for index, row in self.df.iterrows():
-            if row['trial_success']:
+        for index,row in self.successful_trials_df.iterrows():
 
-                path = os.path.join(self.dirpath,f'trial_{index}.csv')
+            trial_id = int(row['Unnamed: 0'])
+
+            try:
+                path = os.path.join(self.dirpath,f'trial_{trial_id}.csv')
                 temp_df = pd.read_csv(path)
                 vals = temp_df['cumulative_cases_simulated'].values
                 plt.plot(vals,color='blue',alpha=0.1)
+
+            except:
+                continue
 
         print(self.cumulative_cases_data)
         plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
@@ -95,7 +108,7 @@ class ABCAnalysis:
 if __name__ == "__main__":
     
     #specify a foldername
-    foldername = ''
+    foldername = 'None'
 
     #if no foldername specified, use the most recent dated folder
     if not foldername:
@@ -109,9 +122,7 @@ if __name__ == "__main__":
 
     #make pairplot
     #print(abca.number_successful_trials())
-    #abca.plot_results()
-    df = abca.df[abca.df['trial_success']==1]
-    print(df.head())
+    abca.plot_results()
     abca.pairplot_R0_k()
     #abca.jointplot_R0_k()
     #abca.plot_results()
