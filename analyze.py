@@ -10,16 +10,18 @@ class ABCAnalysis:
     def __init__(self,foldername,state='vt'):
 
         self.dirpath = os.path.join('simulations',foldername)
-        csv_path = os.path.join(self.dirpath,'trials.csv')
-        self.df = pd.read_csv(csv_path)
+        self.df = pd.read_csv(os.path.join(self.dirpath,'trials.csv'))
+        self.successful_trials_df = pd.read_csv(os.path.join(self.dirpath,'successful_trials.csv'))
 
         #load params
         with open(os.path.join(self.dirpath,'hyperparams.json')) as f:
             for k,v in json.load(f).items():
                 self.__setattr__(k,v)
 
-        #hard code state for now
+
         self.state = state
+        
+        # load cumulative cases data
         data_path = os.path.join('data',f'{self.state}_first_peak.csv')
         self.cumulative_cases_data = pd.read_csv(data_path).values[:,1]
 
@@ -69,40 +71,17 @@ class ABCAnalysis:
         sns.jointplot(data=df,x='R0',y='k')
         plt.show()
 
+
     def plot_priors(self):
         pass
 
     def plot_results(self):
 
         for index,row in self.successful_trials_df.iterrows():
+            plt.plot(row['cumulative_cases_simualted'],color='blue',alpha=0.1)
 
-            trial_id = int(row['Unnamed: 0'])
-
-            try:
-                path = os.path.join(self.dirpath,f'trial_{trial_id}.csv')
-                temp_df = pd.read_csv(path)
-                vals = temp_df['cumulative_cases_simulated'].values
-                plt.plot(vals,color='blue',alpha=0.1)
-
-            except:
-                continue
-
-        print(self.cumulative_cases_data)
         plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
         plt.show()
-
-    @property
-    def successful_trials_df(self):
-        
-        if not hasattr(self,'_successful_trials_df'):
-            fpath = os.path.join(self.dirpath,'successful_trials.csv')
-            if os.path.isfile(fpath):
-                self._successful_trials_df = pd.read_csv(fpath)
-            else:
-                self.df['trial_success'] = self.df.apply(self.determine_trial_success,axis=1)
-                self._successful_trials_df = self.df[self.df['trial_success']==1]
-                self._successful_trials_df.to_csv(fpath)
-        return self._successful_trials_df
 
 
 if __name__ == "__main__":

@@ -10,17 +10,12 @@ from typing import Iterable
 import math
 
 import logging
-import timeit
 
 def neg_binom_pull(r0, k):
     
-    
     probs = []
-    
-    for i in range(10):
-                
+    for i in range(10):    
         probs.append((math.gamma(i+k)/(math.factorial(i)*math.gamma(k)))*((r0)/(k+r0))**(i) * (k/(k + r0))**(k))
-                
                 
     probs = probs/np.sum(probs)
     
@@ -50,7 +45,6 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time 
         R0,k,simulated_cumulative_cases[tuple]: The sampled parameters R0, k, and the cumulative cases.
         Returns -99 for simulated_cumulative_cases if the procedure failed one of the threshold checks.
     """
-    start = timeit.timeit()
 
     cumulative_cases_data= pd.read_csv(f'data/{state}_first_peak.csv').values[:,1]
 
@@ -83,20 +77,8 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time 
     #calculate cumulative_cases
     cumulative_cases_simulated = [int(np.sum(trans_vec[0:i]) + 1) for i in range(1,cutoff_time)] #add 1 for initial case
 
-    end = timeit.timeit()
-    logging.info(end-start)
-
     return cumulative_cases_simulated        
 
-
-def save_data(output,filepath):
-
-    if isinstance(output,str):
-        with open(filepath,'w') as f: 
-            f.write(output)
-    else:
-        df = pd.DataFrame(output,columns = ['cumulative_cases_simulated'])
-        df.to_csv(filepath)
 
 def main(args):
 
@@ -114,22 +96,20 @@ def main(args):
         threshold = args.error
     )
 
-    save_data(output,args.f)
-
 
 if __name__ == "__main__":
+    pass
+    # # setup arguments
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('-f',type=str,help='filename to save the output')
+    # parser.add_argument('-r0',type=float,default = 3.5, help='expected secondary infections parameter for negative binomial distribution')
+    # parser.add_argument('-k',type= float,default = 0.5, help='dispersion parameter for negative binomial')
+    # parser.add_argument('-r',type=float,default = 0.01, help='carry-over infections proportion at each time step')
+    # parser.add_argument('--cutoff',default = -1, type=int,help='stop simualtion after N steps')
+    # parser.add_argument('--state',default='vt')
+    # parser.add_argument('--error',default=0.5,help='the maximum error for simulation when checking against real data')
 
-    # setup arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-f',type=str,help='filename to save the output')
-    parser.add_argument('-r0',type=float,default = 3.5, help='expected secondary infections parameter for negative binomial distribution')
-    parser.add_argument('-k',type= float,default = 0.5, help='dispersion parameter for negative binomial')
-    parser.add_argument('-r',type=float,default = 0.01, help='carry-over infections proportion at each time step')
-    parser.add_argument('--cutoff',default = -1, type=int,help='stop simualtion after N steps')
-    parser.add_argument('--state',default='vt')
-    parser.add_argument('--error',default=0.5,help='the maximum error for simulation when checking against real data')
+    # args = parser.parse_args()
 
-    args = parser.parse_args()
-
-    main(args)
+    # main(args)
 

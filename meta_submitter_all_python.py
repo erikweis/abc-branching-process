@@ -7,10 +7,10 @@ STATES = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DC", "DE", "FL", "GA",
           "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", 
           "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
-def submit(num_trials,state,error,foldername):
+def submit(num_trials,state,error,foldername,subdir=''):
 
     script = f'/usr/bin/sbatch'
-    script += f' --export=ALL,NUM_TRIALS={num_trials},STATE={state},ERROR={error},FOLDERNAME={foldername}'
+    script += f' --export=ALL,NUM_TRIALS={num_trials},STATE={state},ERROR={error},FOLDERNAME={foldername},SUBDIR={subdir}'
     script += ' subscript.sbatch'
     subprocess.call([script],shell=True)
 
@@ -26,6 +26,6 @@ if __name__=='__main__':
     
     if args.state == 'all':
         for state in STATES:
-            submit(args.num_trials,state.lower(),args.error,f"{args.foldername}_{state}")
+            submit(args.num_trials,state.lower(),args.error,f"{args.foldername}_{state}",subdir=args.foldername)
     else:
         submit(args.num_trials,args.state,args.error,args.foldername)
