@@ -5,6 +5,9 @@ import os
 from analyze import ABCAnalysis
 from scipy.stats import gaussian_kde
 from tqdm import tqdm
+import pandas as pd
+import plotly.figure_factory as ff
+
 
 from meta_submitter_all_python import STATES
 
@@ -88,6 +91,19 @@ class MetaABCAnalysis:
 
         # for abca, state in zip(self.abcas, self.states):
         #     print(state,abca.number_successful_trials())
+
+    def plot_map_of_MAPS(self):
+
+        fipsdf = pd.read_csv('data/state2fips.csv')
+
+        state2fips = {state:fips for state, fips in zip(fipsdf['stusps'],fipsdf['st'])}
+
+        fips = []
+        values = range(len(fips))
+
+        fig = ff.create_choropleth(fips=fips, values=values)
+        fig.layout.template = None
+        fig.show()
 
 
 
