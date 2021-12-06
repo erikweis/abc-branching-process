@@ -4,7 +4,19 @@ from seaborn.distributions import kdeplot
 import matplotlib.pyplot as plt
 
 def non_parametric_priors():
-    pass
+    probs = []
+    
+    mus = [1, 0.9, 0.8, 0.7, 0.5, 0.5 ,0.5, 0.5, 0.5, 0.5]
+    
+    for i in range(10):
+        value = scipy.stats.norm.rvs(mus[i], 1)
+        while (value < 0):
+            value = scipy.stats.norm.rvs(mus[i], 1)
+        
+    probs = probs/np.sum(probs)
+    
+    
+    return  np.random.choice(np.arange(0, 10), p=probs)
 
 def normal_priors():
     
