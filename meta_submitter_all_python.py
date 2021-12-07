@@ -23,9 +23,8 @@ if __name__=='__main__':
     parser.add_argument('--num_trials', type = int , default = 100, help = 'number of simulation runs')
     parser.add_argument('--state',type = str, default='vt')
     parser.add_argument('--error',default=0.5,type=float,help='the maximum error for simulation when checking against real data')
-    parser.add_argument('--foldername',default=None,type = str, help='custom foldername')
-    parser.add_argument('--non_parametric',default=False,type=bool,help='non parametric verison')
-
+    parser.add_argument('--foldername',default='',type = str, help='custom foldername')
+    parser.add_argument('--non_parametric',action='store_true',help='non parametric verison')
 
     args = parser.parse_args()
     

@@ -29,12 +29,15 @@ class SimulationRunner:
         self.non_parametric = non_parametric
 
         #get output directory
-        if subdir == "None":
-            subdir = None
+        # if subdir == "None":
+        #     subdir = None
         dirname = foldername if foldername else datetime.now().strftime("%m-%d_%H-%M-%S")
+        print("dirname=",dirname)
         if subdir:
             self.dirpath = os.path.join('simulations', subdir, dirname)
+            print('there is a subdir')
         else:
+            print('there is no subdir')
             self.dirpath = os.path.join('simulations',dirname)
         os.mkdir(self.dirpath)
 
