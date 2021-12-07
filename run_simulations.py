@@ -103,6 +103,7 @@ class SimulationRunner:
         # add trial success to data
         self.paramDF['trial_success'] = trial_successes
         self.paramDF.to_csv(os.path.join(self.dirpath,'trials.csv'))
+        print(self.paramDF.head())
 
         # save successful trials to df
         df = pd.DataFrame(self.successful_trials_data)
@@ -114,8 +115,10 @@ class SimulationRunner:
     def __exit__(self):
 
          # save successful trials to df
-        df = pd.DataFrame(self.successful_trials_data)
-        df.to_csv(os.path.join(self.dirpath,'successful_trials.csv'))
+         filepath = os.path.join(self.dirpath,'successful_trials.csv')
+         if not os.path.isfile(filepath):
+            df = pd.DataFrame(self.successful_trials_data)
+            df.to_csv(filepath)
 
 
 
