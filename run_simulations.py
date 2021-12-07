@@ -54,8 +54,7 @@ class SimulationRunner:
 
         #save csv
         paramDF = pd.DataFrame(list(zip(r0List, kList, rList)), columns = ['R0', 'k', 'recovery'])
-        trials_fpath = os.path.join(self.dirpath,'trials.csv')
-        paramDF.to_csv(trials_fpath)
+        paramDF.to_csv(os.path.join(self.dirpath,'trials.csv'))
         self.paramDF = paramDF
     
         logging.info("finished initialization of WriteFiles object.")
@@ -64,7 +63,7 @@ class SimulationRunner:
     def run_all_simulations(self):
 
         trial_successes = []
-        successful_trials_data = []
+        self.successful_trials_data = []
 
         for index, vals in enumerate(self.paramDF.to_numpy()):
             
@@ -78,19 +77,27 @@ class SimulationRunner:
                 trial_successes.append(0)
             else:
                 results_dict = {'trialID':index, 'cumulative_cases_simulated':output,'r0':r0,'k':k,'r':r}
-                successful_trials_data.append(results_dict)
+                self.successful_trials_data.append(results_dict)
                 trial_successes.append(1)
 
         # add trial success to data
         self.paramDF['trial_success'] = trial_successes
+        self.paramDF.to_csv(os.path.join(self.dirpath,'trials.csv'))
 
         # save successful trials to df
-        df = pd.DataFrame(successful_trials_data)
+        df = pd.DataFrame(self.successful_trials_data)
         df.to_csv(os.path.join(self.dirpath,'successful_trials.csv'))
 
         logging.info("finished all jobs")
         sys.exit()
         
+    def __exit__(self):
+
+         # save successful trials to df
+        df = pd.DataFrame(self.successful_trials_data)
+        df.to_csv(os.path.join(self.dirpath,'successful_trials.csv'))
+
+
 
 if __name__=='__main__':
     

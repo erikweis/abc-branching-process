@@ -13,47 +13,48 @@ from meta_submitter_all_python import STATES
 
 class MetaABCAnalysis:
 
-    def __init__(self,folder_tag):
+    def __init__(self,subdir):
 
-        folders = [f for f in os.listdir('simulations/') if f.startswith(folder_tag)]
+        folders = [f for f in os.listdir(os.path.join('simulations',subdir))]
         states = [f.split('_')[-1] for f in folders]
-        self.states = states
 
         self.abcas = []
         for f,s in tqdm(zip(folders,states)):
             try:
-                self.abcas.append(ABCAnalysis(f,state=s))
-            except:
-                continue
-        # self.abcas = [ABCAnalysis(f,state=s) for f,s in zip(folders,states)]
+                self.abcas.append(ABCAnalysis(os.path.join(subdir,f),state=s))
+            except Exception as e:
+                print(e)
+        
+        self.states = [abca.state for abca in self.abcas]
+        #self.abcas = [ABCAnalysis(f,state=s) for f,s in zip(folders,states)]
 
     
     def plot_posteriors(self):
 
         dfs = [abca.successful_trials_df for abca in self.abcas]
         
-        fig, axes = plt.subplots(1,3,figsize=(10,4))
+        fig, axes = plt.subplots(1,2,figsize=(10,4))
         
         for df,state in tqdm(zip(dfs,self.states)):
 
-            r0_x = np.linspace(0,2,200)
-            k_x = np.linspace(0,3,200)
+            r0_x = np.linspace(0,6.5,200)
+            k_x = np.linspace(0,1.1,200)
             r_x = np.linspace(0,1,200)
 
-            r0_y = gaussian_kde(df['R0']).pdf(r0_x)
+            r0_y = gaussian_kde(df['r0']).pdf(r0_x)
             k_y = gaussian_kde(df['k']).pdf(k_x)
-            r_y = gaussian_kde(df['recovery']).pdf(r_x)
+            #r_y = gaussian_kde(df['r']).pdf(r_x)
 
             color = 'red' if state.lower()=='vt' else 'steelblue'
             alpha = 1 if state.lower() =='vt' else 0.3
 
             axes[0].plot(r0_x,r0_y,color=color,alpha=alpha)
             axes[1].plot(k_x,k_y,color=color,alpha=alpha)
-            axes[2].plot(r_x,r_y,color=color,alpha=alpha)
+            #axes[2].plot(r_x,r_y,color=color,alpha=alpha)
         
         axes[0].set_title('r0')
         axes[1].set_title('k')
-        axes[2].set_title('recovery')
+        #axes[2].set_title('recovery')
 
         fig.tight_layout()
 
@@ -80,38 +81,32 @@ class MetaABCAnalysis:
 
         plt.scatter(max_cumulative_cases,num_successful_trials)
 
-        for i, txt in enumerate(STATES):
+        for i, txt in enumerate(self.states):
             plt.annotate(txt, ( max_cumulative_cases[i],num_successful_trials[i]))
 
-        plt.xscale('log')
+        #plt.xscale('log')
         plt.xlabel('Max Cumulative Cases')
-        plt.yscale('log')
+        #plt.yscale('log')
         plt.ylabel('Number of Accepted Samples')
         plt.show()
 
         # for abca, state in zip(self.abcas, self.states):
         #     print(state,abca.number_successful_trials())
 
-    def plot_map_of_MAPS(self):
 
-        fipsdf = pd.read_csv('data/state2fips.csv')
+    def plot_map_of_MAPS(self,param):
 
-        state2fips = {state:fips for state, fips in zip(fipsdf['stusps'],fipsdf['st'])}
-
-        fips = []
-        values = range(len(fips))
-
-        fig = ff.create_choropleth(fips=fips, values=values)
-        fig.layout.template = None
-        fig.show()
+        self.MAPS = [abca.get_MAP(param) for abca in self.abcas]
+        print(self.MAPS)
 
 
 
 if __name__ == "__main__":
 
-    mabca = MetaABCAnalysis('state_sweep')
+    mabca = MetaABCAnalysis('state_sweep_3')
+    mabca.plot_map_of_MAPS('r0')
     mabca.visualize_sample_counts()
-    #mabca.plot_posteriors()
+    mabca.plot_posteriors()
 
 
         

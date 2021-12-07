@@ -32,7 +32,7 @@ def simulation_within_threshold(cumulative_cases_simulated, cumulative_cases_dat
     return error <= threshold
 
 
-def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time = None,threshold=0.5):
+def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt',threshold=0.5):
 
     """ Simulate a branching process with {cutoff_time} steps,
     according to parameters R0 and K, drawn from prior beta
@@ -48,8 +48,7 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt', cutoff_time 
 
     cumulative_cases_data= pd.read_csv(f'data/{state}_first_peak.csv').values[:,1]
 
-    if not cutoff_time:
-        cutoff_time = len(cumulative_cases_data)
+    cutoff_time = len(cumulative_cases_data)
 
     trans_vec = np.zeros(cutoff_time)
     infect_vec = np.zeros(cutoff_time)
@@ -86,12 +85,10 @@ def main(args):
         print("No file name called")
         sys.exit(1)
 
-    cutoff_time = None if args.cutoff < 0 else args.cutoff
     output = simulate_branching_process(
         r0 = args.r0,
         k = args.k,
         r = args.r,
-        cutoff_time = cutoff_time,
         state = args.state,
         threshold = args.error
     )

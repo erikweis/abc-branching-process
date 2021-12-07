@@ -4,12 +4,14 @@ import os
 import seaborn as sns
 import matplotlib.pyplot as plt
 import json
+from scipy.stats import gaussian_kde
+import numpy as np
 
 class ABCAnalysis:
 
-    def __init__(self,foldername,state='vt'):
+    def __init__(self,path,state='vt'):
 
-        self.dirpath = os.path.join('simulations',foldername)
+        self.dirpath = os.path.join('simulations',path)
         self.df = pd.read_csv(os.path.join(self.dirpath,'trials.csv'))
         self.successful_trials_df = pd.read_csv(os.path.join(self.dirpath,'successful_trials.csv'))
 
@@ -25,55 +27,34 @@ class ABCAnalysis:
         data_path = os.path.join('data',f'{self.state}_first_peak.csv')
         self.cumulative_cases_data = pd.read_csv(data_path).values[:,1]
 
+
     def number_successful_trials(self):
         return len(self.successful_trials_df)
 
 
-    def determine_trial_success(self,row):
-
-        trial_ID = int(row['Unnamed: 0'])
-        path = os.path.join(self.dirpath,f'trial_{trial_ID}.csv'    )
-
-        try:
-            with open(path,'r') as f:
-                text = f.read()
-                if text.startswith('Failure'):
-                    return 0
-                else:
-                    return 1
-        except:
-            return 0
-
-    def plot_distribution_failures(self):
-        pass
-
-    def pairplot_R0_k(self,successful_trials_only = True):
+    def pairplot_R0_k(self):
 
         """Pairplot of R0 and k"""
 
-        df = self.successful_trials_df if successful_trials_only else self.df
-
-        sns.pairplot(df,vars=['R0','k'],diag_kws=dict(bins=20))
+        sns.pairplot(self.successful_trials_df,vars=['R0','k'],diag_kws=dict(bins=20))
         plt.show()
 
-    def pairplot(self,successful_trials_only = True):
 
-        df = self.successful_trials_df if successful_trials_only else self.df
+    def pairplot(self):
 
-        sns.pairplot(df,vars=['R0','k','recovery'],diag_kws=dict(bins=20))
+        sns.pairplot(self.successful_trials_df,vars=['R0','k','recovery'],diag_kws=dict(bins=20))
         plt.show()
-        
+
 
     def jointplot_R0_k(self,successful_trials_only=True):
 
-        df = self.successful_trials_df if successful_trials_only else self.df
-
-        sns.jointplot(data=df,x='R0',y='k')
+        sns.jointplot(data=self.successful_trials_df,x='R0',y='k')
         plt.show()
 
 
     def plot_priors(self):
         pass
+
 
     def plot_results(self):
 
@@ -83,11 +64,15 @@ class ABCAnalysis:
         plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
         plt.show()
 
+    def get_MAP(self,param,test_range=(0,10)):
+        
+        kernel = gaussian_kde(self.successful_trials_df[param].values)
+        return max(kernel(np.linspace(*test_range,1000)))
 
 if __name__ == "__main__":
     
     #specify a foldername
-    foldername = 'None'
+    foldername = ''
 
     #if no foldername specified, use the most recent dated folder
     if not foldername:
