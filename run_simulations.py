@@ -29,6 +29,8 @@ class SimulationRunner:
         self.non_parametric = non_parametric
 
         #get output directory
+        if subdir == "None":
+            subdir = None
         dirname = foldername if foldername else datetime.now().strftime("%m-%d_%H-%M-%S")
         if subdir:
             self.dirpath = os.path.join('simulations', subdir, dirname)
@@ -121,7 +123,7 @@ if __name__=='__main__':
     parser.add_argument('--state',default='vt')
     parser.add_argument('--error',default=0.5,type=float, help='the maximum error for simulation when checking against real data')
     parser.add_argument('--foldername',default='',help='custom foldername')
-    parser.add_argument('--subdir',default='',type=str, help='subdir to hold related trials')
+    parser.add_argument('--subdir',default=None,type=str, help='subdir to hold related trials')
     parser.add_argument('--non_parametric',default=False,type=bool,help='non parametric version')
 
     args = parser.parse_args()
