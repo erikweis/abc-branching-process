@@ -79,15 +79,18 @@ class SimulationRunner:
 
         for index, vals in enumerate(self.paramDF.to_numpy()):
             
+            #log every 100
             if index%100==0:
                 logging.info(f"starting trial {index} at {datetime.now()}")
 
+            #run branching process
             if self.non_parametric:
                 output = simulate_branching_process(ps=vals,state = self.state,threshold=self.error)
             else:
                 r0,k,r = vals
                 output = simulate_branching_process(r0=r0,k=k,r=r,state = self.state,threshold = self.error)
 
+            # check for failure
             if isinstance(output,str) and output.startswith('Failure'):
                 trial_successes.append(0)
             else:
@@ -103,7 +106,6 @@ class SimulationRunner:
         # add trial success to data
         self.paramDF['trial_success'] = trial_successes
         self.paramDF.to_csv(os.path.join(self.dirpath,'trials.csv'))
-        print(self.paramDF.head())
 
         # save successful trials to df
         df = pd.DataFrame(self.successful_trials_data)
@@ -119,8 +121,7 @@ class SimulationRunner:
          if not os.path.isfile(filepath):
             df = pd.DataFrame(self.successful_trials_data)
             df.to_csv(filepath)
-
-
+            
 
 if __name__=='__main__':
     

@@ -42,6 +42,16 @@ def plot_priors(prior_func, samples=1000):
     plt.legend()
     plt.show()
 
+def plot_nonparametric_priors():
+
+
+    fig,axes = plt.subplots(5,2)
+
+    for i, ax in enumerate(axes.flatten()):
+        ax = plt.sca()
+        kdeplot()
+
+
 if __name__ == "__main__":
 
     plot_priors(normal_priors,samples=10000)
