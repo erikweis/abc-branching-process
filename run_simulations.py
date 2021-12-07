@@ -33,7 +33,7 @@ class SimulationRunner:
             os.mkdir(os.path.join('simulations',subdir))
             self.dirpath = os.path.join('simulations', subdir, dirname)
         else:
-            self.dirpath = self.os.path.join('simulations',dirname)
+            self.dirpath = os.path.join('simulations',dirname)
         os.mkdir(self.dirpath)
 
         # save run params to a json file
