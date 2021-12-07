@@ -17,8 +17,8 @@ def submit(num_trials,state,error,foldername,subdir='',non_parametric=False):
     subdir_string = f"--subdir {subdir}" if subdir else ''
     nonparametric_string = f"--non_parametric" if non_parametric else ''
     
-    subscript = f"""
-        #!/bin/sh
+    subscript = \
+        f"""#!/bin/sh
 
         #SBATCH --partition=short
         #SBATCH --nodes=1
