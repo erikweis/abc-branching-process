@@ -8,4 +8,8 @@
 
 echo $NUM_TRIALS
 echo $SUBDIR
-python run_simulations.py --num_trials $NUM_TRIALS --state $STATE --error $ERROR --foldername $FOLDERNAME --subdir $SUBDIR --non_parametric $NONPARAMETRIC
+
+if ["$SUBDIR"==""]; 
+then  python run_simulations.py --num_trials $NUM_TRIALS --state $STATE --error $ERROR --foldername $FOLDERNAME --subdir $SUBDIR --non_parametric $NONPARAMETRIC
+else python run_simulations.py --num_trials $NUM_TRIALS --state $STATE --error $ERROR --foldername $FOLDERNAME --non_parametric $NONPARAMETRIC
+fi
