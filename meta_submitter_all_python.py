@@ -1,5 +1,6 @@
 import argparse
 import subprocess
+import os
 
 STATES = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DC", "DE", "FL", "GA", 
           "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", 
@@ -26,6 +27,7 @@ if __name__=='__main__':
     
     if args.state == 'all':
         for state in STATES:
+            os.mkdir(os.path.join('simulation',args.foldername))
             submit(args.num_trials,state.lower(),args.error,f"{args.foldername}_{state}",subdir=args.foldername)
     else:
         submit(args.num_trials,args.state,args.error,args.foldername)

@@ -4,7 +4,6 @@ import json
 import sys
 import pandas as pd
 import argparse
-import subprocess
 from tqdm import tqdm
 import logging
 from datetime import datetime
@@ -30,7 +29,6 @@ class SimulationRunner:
         #get output directory
         dirname = foldername if foldername else datetime.now().strftime("%m-%d_%H-%M-%S")
         if subdir:
-            os.mkdir(os.path.join('simulations',subdir))
             self.dirpath = os.path.join('simulations', subdir, dirname)
         else:
             self.dirpath = os.path.join('simulations',dirname)
