@@ -127,7 +127,7 @@ if __name__=='__main__':
     parser.add_argument('--error',default=0.5,type=float, help='the maximum error for simulation when checking against real data')
     parser.add_argument('--foldername',default='',help='custom foldername')
     parser.add_argument('--subdir',default='',type=str, help='subdir to hold related trials')
-    parser.add_argument('--non_parametric',default=False,type=bool,help='non parametric version')
+    parser.add_argument('--non_parametric',action='store_true',help='non parametric version')
 
     args = parser.parse_args()
     

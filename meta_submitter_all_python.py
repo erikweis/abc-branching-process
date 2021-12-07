@@ -12,6 +12,25 @@ STATES = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DC", "DE", "FL", "GA",
 
 def submit(num_trials,state,error,foldername,subdir='',non_parametric=False):
 
+
+    foldername_string = f"--foldername {foldername}" if foldername else ''
+    subdir_string = f"--subdir {subdir}" if subdir else ''
+    nonparametric_string = f"--non_parametric" if non_parametric else ''
+    
+    subscript = f"""
+        #!/bin/sh
+
+        #SBATCH --partition=short
+        #SBATCH --nodes=1
+        #SBATCH --mem=2gb
+        #SBATCH --time=3:00:00
+        #SBATCH --job-name=1997
+
+        python run_simulations.py --num_trials $NUM_TRIALS --state $STATE --error $ERROR {foldername_string} {subdir_string} {nonparametric_string} """
+    
+    with open('subscript.sbatch','w') as f:
+        f.write(subscript)
+
     script = f'/usr/bin/sbatch'
     script += f' --export=ALL,NUM_TRIALS={num_trials},STATE={state},ERROR={error},FOLDERNAME={foldername},SUBDIR={subdir},NONPARAMETRIC={non_parametric}'
     script += ' subscript.sbatch'
@@ -24,7 +43,7 @@ if __name__=='__main__':
     parser.add_argument('--state',type = str, default='vt')
     parser.add_argument('--error',default=0.5,type=float,help='the maximum error for simulation when checking against real data')
     parser.add_argument('--foldername',default='',type = str, help='custom foldername')
-    parser.add_argument('--non_parametric',default=False,type=bool,help='non parametric verison')
+    parser.add_argument('--non_parametric',action='store_true',help='non parametric verison')
 
     args = parser.parse_args()
     
