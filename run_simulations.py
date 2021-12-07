@@ -66,7 +66,7 @@ class SimulationRunner:
     def run_all_simulations(self):
 
         trial_successes = []
-        successful_trials_data = {}
+        successful_trials_data = []
 
         for index, vals in enumerate(self.paramDF.to_numpy()):
             
