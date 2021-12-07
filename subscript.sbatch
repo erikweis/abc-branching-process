@@ -7,4 +7,5 @@
 #SBATCH --job-name=1997
 
 echo $NUM_TRIALS
-python run_simulations.py --num_trials $NUM_TRIALS --state $STATE --error $ERROR --foldername $FOLDERNAME --subdir $SUBDIR
+echo $SUBDIR
+python run_simulations.py --num_trials $NUM_TRIALS --state $STATE --error $ERROR --foldername $FOLDERNAME --subdir $SUBDIR --non_parametric $NONPARAMETRIC
