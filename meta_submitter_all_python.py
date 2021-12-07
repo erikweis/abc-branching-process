@@ -10,10 +10,10 @@ STATES = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DC", "DE", "FL", "GA",
           "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", 
           "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
-def submit(num_trials,state,error,foldername,subdir='',nonparametric=False):
+def submit(num_trials,state,error,foldername,subdir='',non_parametric=False):
 
     script = f'/usr/bin/sbatch'
-    script += f' --export=ALL,NUM_TRIALS={num_trials},STATE={state},ERROR={error},FOLDERNAME={foldername},SUBDIR={subdir},NONPARAMETRIC={nonparametric}'
+    script += f' --export=ALL,NUM_TRIALS={num_trials},STATE={state},ERROR={error},FOLDERNAME={foldername},SUBDIR={subdir},NONPARAMETRIC={non_parametric}'
     script += ' subscript.sbatch'
     subprocess.call([script],shell=True)
 
