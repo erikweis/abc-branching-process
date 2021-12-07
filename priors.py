@@ -15,8 +15,8 @@ def non_parametric_priors():
         
     probs = probs/np.sum(probs)
     
-    
-    return  np.random.choice(np.arange(0, 10), p=probs)
+    return  probs
+
 
 def normal_priors():
     

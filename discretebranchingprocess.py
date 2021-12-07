@@ -21,8 +21,14 @@ def neg_binom_pull(r0, k):
     
     return  np.random.choice(np.arange(0, 10), p=probs)
 
+
 def binom_pull(r, infect_count):
     return np.random.binomial(infect_count, 1 - r)
+
+
+def non_parametric_pull(ps):
+    np.random.choice(np.arange(0,10),p=ps)
+
 
 def simulation_within_threshold(cumulative_cases_simulated, cumulative_cases_data,threshold=0.5):
 
@@ -32,7 +38,7 @@ def simulation_within_threshold(cumulative_cases_simulated, cumulative_cases_dat
     return error <= threshold
 
 
-def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt',threshold=0.5):
+def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',threshold=0.5):
 
     """ Simulate a branching process with {cutoff_time} steps,
     according to parameters R0 and K, drawn from prior beta
@@ -61,7 +67,11 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt',threshold=0.5
 
         temp = 0
         for j in range(int(infect_vec[i-1])):
-            temp = temp + neg_binom_pull(r0, k)
+
+            if ps:
+                temp += non_parametric_pull(ps)
+            elif (r0 is not None) and (k is not None):
+                temp += neg_binom_pull(r0, k)
 
         trans_vec[i] = temp
         infect_vec[i] = trans_vec[i] + binom_pull(r, infect_vec[i - 1])        
@@ -71,7 +81,7 @@ def simulate_branching_process(r0=3.5, k=0.5, r = 0.01, state='vt',threshold=0.5
                 return f"Failure at {i}"
         elif i<min(checkpoints) and np.sum(trans_vec)>max(cumulative_cases_data)/2:
             #double check the branching process isn't going crazy right away
-            return f"Failuer at {i}"
+            return f"Failure at {i}"
 
     #calculate cumulative_cases
     cumulative_cases_simulated = [int(np.sum(trans_vec[0:i]) + 1) for i in range(1,cutoff_time)] #add 1 for initial case

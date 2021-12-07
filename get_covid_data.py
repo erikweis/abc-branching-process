@@ -78,16 +78,16 @@ if __name__ == "__main__":
     #     get_state_data(state.lower(),save=True)
 
     #### test peak detection ######
-    # for state in states:
-    #     df = pd.read_csv(f'data/{state.lower()}.csv')
-    #     add_new_cases_column(df)
-    #     test_peak_detection(df,state)
+    for state in states[:10]:
+        df = pd.read_csv(f'data/{state.lower()}.csv')
+        add_new_cases_column(df)
+        test_peak_detection(df,state)
 
     ###### save only first wave cumulative cases #####
-    for state in states:
-        state=state.lower()
-        df = pd.read_csv(f'data/{state}.csv')
-        df = add_new_cases_column(df)
-        fw = get_first_wave_data(df,state,save=True)
-        print(fw[0])
+    # for state in states:
+    #     state=state.lower()
+    #     df = pd.read_csv(f'data/{state}.csv')
+    #     df = add_new_cases_column(df)
+    #     fw = get_first_wave_data(df,state,save=True)
+    #     print(fw[0])
 
