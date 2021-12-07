@@ -27,7 +27,7 @@ if __name__=='__main__':
     
     if args.state == 'all':
         for state in STATES:
-            os.mkdir(os.path.join('simulation',args.foldername))
+            os.mkdir(os.path.join('simulations',args.foldername))
             submit(args.num_trials,state.lower(),args.error,f"{args.foldername}_{state}",subdir=args.foldername)
     else:
         submit(args.num_trials,args.state,args.error,args.foldername)
