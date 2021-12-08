@@ -62,6 +62,12 @@ class ABCAnalysis:
             plt.plot(row['cumulative_cases_simulated'],color='blue',alpha=0.1)
 
         plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
+        
+        #plot error bounds
+        c = np.array(self.cumulative_cases_data)
+        lower_bound = c + c*0.5 
+        upper_bound = c - c*0.5 
+        plt.fill_between(np.arange(len(c)),lower_bound,upper_bound,alpha=0.5)
         plt.show()
 
     def get_MAP(self,param,test_range=(0,10)):
@@ -72,7 +78,7 @@ class ABCAnalysis:
 if __name__ == "__main__":
     
     #specify a foldername
-    foldername = 'state_sweep_non_parametric/state_sweep_non_parametric_NY'
+    foldername = ''
 
     #if no foldername specified, use the most recent dated folder
     if not foldername:
@@ -87,6 +93,6 @@ if __name__ == "__main__":
     #make pairplot
     #print(abca.number_successful_trials())
     abca.plot_results()
-    abca.pairplot_R0_k()
+    #abca.pairplot_R0_k()
     #abca.jointplot_R0_k()
     #abca.plot_results()

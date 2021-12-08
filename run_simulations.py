@@ -90,7 +90,6 @@ class SimulationRunner:
 
             # check for failure
             if isinstance(output,str) and output.startswith('Failure'):
-                print("Failure")
                 trial_successes.append(0)
             else:
                 print("success",vals)

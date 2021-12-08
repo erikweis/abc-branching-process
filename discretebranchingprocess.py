@@ -60,7 +60,7 @@ def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',thr
     infect_vec = np.zeros(cutoff_time)
 
     # Check the values here for the ABC
-    checkpoints = np.arange(10,cutoff_time)
+    checkpoints = np.arange(15,cutoff_time)
 
     infect_vec[0] = 1
     for i in range(1, cutoff_time):
@@ -78,7 +78,7 @@ def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',thr
 
         if i in checkpoints:
             if not simulation_within_threshold(np.sum(trans_vec), cumulative_cases_data[i],threshold):
-                #print(f"failure at time {i}", r0,k,r)
+                print(f"failure at time {i}", np.sum(trans_vec))
                 return f"Failure at {i}"
         elif i<min(checkpoints) and np.sum(trans_vec)>max(cumulative_cases_data)/2:
             #double check the branching process isn't going crazy right away
