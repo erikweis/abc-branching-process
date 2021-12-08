@@ -57,35 +57,38 @@ class ABCAnalysis:
 
     def plot_results(self):
 
-        for index,row in self.successful_trials_df.iterrows():
-            plt.plot(row['cumulative_cases_simulated'],color='blue',alpha=0.1)
-
-            trial_id = int(row['Unnamed: 0'])
-
-            try:
-                path = os.path.join(self.dirpath,f'trial_{trial_id}.csv')
-                temp_df = pd.read_csv(path)
-                vals = temp_df['cumulative_cases_simulated'].values
-                plt.plot(vals,color='blue',alpha=0.1)
-
-            except:
-                print(trial_id)
-                continue
-
-        print(self.cumulative_cases_data)
-        plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
-        
         #plot error bounds
         c = np.array(self.cumulative_cases_data)
         lower_bound = c + c*0.5 
         upper_bound = c - c*0.5 
-        plt.fill_between(np.arange(len(c)),lower_bound,upper_bound,alpha=0.5)
+        plt.fill_between(np.arange(len(c)),lower_bound,upper_bound,alpha=0.2)
+
+        #plot simulated results
+        for index,row in self.successful_trials_df.iterrows():
+            d = eval(row['cumulative_cases_simulated'])
+            print(d)
+            plt.plot(d,color='blue',alpha=1)
+
+        plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
         plt.show()
 
     def get_MAP(self,param,test_range=(0,10)):
         
         kernel = gaussian_kde(self.successful_trials_df[param].values)
         return max(kernel(np.linspace(*test_range,1000)))
+
+
+    def plot_data_and_error_bar(self):
+
+        #plot error bounds
+        c = np.array(self.cumulative_cases_data)
+        lower_bound = c + c*0.5 
+        upper_bound = c - c*0.5 
+        plt.fill_between(np.arange(len(c)),lower_bound,upper_bound,alpha=0.2)
+
+        #plot data
+        plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
+        plt.show()
 
 if __name__ == "__main__":
     
@@ -103,8 +106,8 @@ if __name__ == "__main__":
     print(abca.number_successful_trials())
 
     #make pairplot
-    #print(abca.number_successful_trials())
     abca.plot_results()
-    #abca.pairplot_R0_k()
-    #abca.jointplot_R0_k()
+    #abca.plot_data_and_error_bar()
+    abca.pairplot_R0_k()
+    abca.jointplot_R0_k()
     #abca.plot_results()

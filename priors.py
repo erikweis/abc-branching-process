@@ -25,8 +25,8 @@ def normal_priors():
     r0,k,r = -1,-1,-1
     while (r0<0 or k<0 or k>1 or r<0 or r>1):
         r0 = scipy.stats.norm.rvs(3.2,1.3)
-        k = scipy.stats.norm.rvs(0.5,0.7)
-        r = 0 #scipy.stats.norm.rvs(0.1,0.2)
+        k = scipy.stats.uniform(0,0.05) #scipy.stats.norm.rvs(0.5,0.7)
+        r = scipy.stats.norm.rvs(0.1,0.2)
     
     return r0,k,r
 
@@ -38,10 +38,18 @@ def plot_priors(prior_func, samples=1000):
 
     samples = np.array([prior_func() for _ in range(samples)])
 
+    fig, ax = plt.subplots(1,3,figsize=(9,3))
+
+    plt.sca(ax[0])
     out1 = kdeplot(samples[:,0],label='r0')
+    plt.title('r0')
+    plt.sca(ax[1])
+    plt.title('k')
     out2 = kdeplot(samples[:,1],label='k')
+    plt.sca(ax[2])
+    plt.title('recovery')
     out3 = kdeplot(samples[:,2],label='r')
-    plt.legend()
+    plt.tight_layout()
     plt.show()
 
 def plot_nonparametric_priors(prior_func, samples = 1000):
@@ -58,5 +66,5 @@ def plot_nonparametric_priors(prior_func, samples = 1000):
 
 if __name__ == "__main__":
 
-    plot_priors(normal_priors,samples=10000)
+    plot_priors(normal_priors,samples=100000)
     #plot_nonparametric_priors(non_parametric_priors, samples = 10000)
