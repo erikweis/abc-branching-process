@@ -38,7 +38,7 @@ def simulation_within_threshold(cumulative_cases_simulated, cumulative_cases_dat
     return error <= threshold
 
 
-def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',threshold=0.5):
+def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',threshold=0):
 
     """ Simulate a branching process with {cutoff_time} steps,
     according to parameters R0 and K, drawn from prior beta
@@ -78,6 +78,7 @@ def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',thr
 
         if i in checkpoints:
             if not simulation_within_threshold(np.sum(trans_vec), cumulative_cases_data[i],threshold):
+                #print(f"failure at time {i}", r0,k,r)
                 return f"Failure at {i}"
         elif i<min(checkpoints) and np.sum(trans_vec)>max(cumulative_cases_data)/2:
             #double check the branching process isn't going crazy right away

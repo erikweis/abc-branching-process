@@ -28,9 +28,7 @@ class SimulationRunner:
         self.foldername = foldername
         self.non_parametric = non_parametric
 
-        #get output directory
-        # if subdir == "None":
-        #     subdir = None
+        print(self.state)
         print("non-parametric:",self.non_parametric)
 
         dirname = foldername if foldername else datetime.now().strftime("%m-%d_%H-%M-%S")
@@ -92,6 +90,7 @@ class SimulationRunner:
 
             # check for failure
             if isinstance(output,str) and output.startswith('Failure'):
+                print("Failure")
                 trial_successes.append(0)
             else:
                 print("success",vals)

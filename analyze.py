@@ -36,7 +36,7 @@ class ABCAnalysis:
 
         """Pairplot of R0 and k"""
 
-        sns.pairplot(self.successful_trials_df,vars=['R0','k'],diag_kws=dict(bins=20))
+        sns.pairplot(self.successful_trials_df,vars=['r0','k'],diag_kws=dict(bins=20))
         plt.show()
 
 
@@ -59,7 +59,7 @@ class ABCAnalysis:
     def plot_results(self):
 
         for index,row in self.successful_trials_df.iterrows():
-            plt.plot(row['cumulative_cases_simualted'],color='blue',alpha=0.1)
+            plt.plot(row['cumulative_cases_simulated'],color='blue',alpha=0.1)
 
         plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
         plt.show()
@@ -72,7 +72,7 @@ class ABCAnalysis:
 if __name__ == "__main__":
     
     #specify a foldername
-    foldername = ''
+    foldername = 'state_sweep_non_parametric/state_sweep_non_parametric_NY'
 
     #if no foldername specified, use the most recent dated folder
     if not foldername:
