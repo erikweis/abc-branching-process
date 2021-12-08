@@ -20,7 +20,6 @@ class ABCAnalysis:
             for k,v in json.load(f).items():
                 self.__setattr__(k,v)
 
-
         self.state = state
         
         # load cumulative cases data
@@ -61,6 +60,19 @@ class ABCAnalysis:
         for index,row in self.successful_trials_df.iterrows():
             plt.plot(row['cumulative_cases_simulated'],color='blue',alpha=0.1)
 
+            trial_id = int(row['Unnamed: 0'])
+
+            try:
+                path = os.path.join(self.dirpath,f'trial_{trial_id}.csv')
+                temp_df = pd.read_csv(path)
+                vals = temp_df['cumulative_cases_simulated'].values
+                plt.plot(vals,color='blue',alpha=0.1)
+
+            except:
+                print(trial_id)
+                continue
+
+        print(self.cumulative_cases_data)
         plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
         
         #plot error bounds
