@@ -6,16 +6,19 @@ import matplotlib.pyplot as plt
 def non_parametric_priors():
     probs = []
     
-    mus = [1, 0.9, 0.8, 0.7, 0.5, 0.5 ,0.5, 0.5, 0.5, 0.5]
+    mus = [1, 0.8, 0.6, 0.4, 0.2, 0.1 ,0.1, 0.1, 0.1, 0.1]
     
     for i in range(10):
         value = scipy.stats.norm.rvs(mus[i], 1)
         while (value < 0):
             value = scipy.stats.norm.rvs(mus[i], 1)
         
+        probs.append(value)
+        
     probs = probs/np.sum(probs)
     
     return  probs
+
 
 
 def normal_priors():
@@ -42,16 +45,19 @@ def plot_priors(prior_func, samples=1000):
     plt.legend()
     plt.show()
 
-def plot_nonparametric_priors():
+def plot_nonparametric_priors(prior_func, samples = 1000):
 
-
+    samples = np.array([prior_func() for _ in range(samples)])
+     
     fig,axes = plt.subplots(5,2)
 
     for i, ax in enumerate(axes.flatten()):
-        ax = plt.sca()
-        kdeplot()
-
+        kdeplot(ax = [i//5], x = samples[:,i], label=("p_{%d}" %i))
+        
+        
+    plt.show()
 
 if __name__ == "__main__":
 
     plot_priors(normal_priors,samples=10000)
+    plot_nonparametric_priors(non_parametric_priors, samples = 10000)
