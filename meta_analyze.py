@@ -7,6 +7,7 @@ from scipy.stats import gaussian_kde
 from tqdm import tqdm
 import pandas as pd
 import plotly.figure_factory as ff
+import plotly.express as px
 
 
 from meta_submitter_all_python import STATES
@@ -33,28 +34,30 @@ class MetaABCAnalysis:
 
         dfs = [abca.successful_trials_df for abca in self.abcas]
         
-        fig, axes = plt.subplots(1,2,figsize=(10,4))
+        fig, axes = plt.subplots(1,3,figsize=(10,4))
         
         for df,state in tqdm(zip(dfs,self.states)):
+            try:
+                r0_x = np.linspace(0,6.5,200)
+                k_x = np.linspace(0,0.07,200)
+                r_x = np.linspace(0,0.5,200)
 
-            r0_x = np.linspace(0,6.5,200)
-            k_x = np.linspace(0,1.1,200)
-            r_x = np.linspace(0,1,200)
+                r0_y = gaussian_kde(df['r0']).pdf(r0_x)
+                k_y = gaussian_kde(df['k']).pdf(k_x)
+                r_y = gaussian_kde(df['r']).pdf(r_x)
 
-            r0_y = gaussian_kde(df['r0']).pdf(r0_x)
-            k_y = gaussian_kde(df['k']).pdf(k_x)
-            #r_y = gaussian_kde(df['r']).pdf(r_x)
+                color = 'red' if state.lower()=='vt' else 'steelblue'
+                alpha = 1 if state.lower() =='vt' else 0.3
 
-            color = 'red' if state.lower()=='vt' else 'steelblue'
-            alpha = 1 if state.lower() =='vt' else 0.3
-
-            axes[0].plot(r0_x,r0_y,color=color,alpha=alpha)
-            axes[1].plot(k_x,k_y,color=color,alpha=alpha)
-            #axes[2].plot(r_x,r_y,color=color,alpha=alpha)
+                axes[0].plot(r0_x,r0_y,color=color,alpha=alpha)
+                axes[1].plot(k_x,k_y,color=color,alpha=alpha)
+                axes[2].plot(r_x,r_y,color=color,alpha=alpha)
+            except:
+                continue
         
         axes[0].set_title('r0')
         axes[1].set_title('k')
-        #axes[2].set_title('recovery')
+        axes[2].set_title('recovery')
 
         fig.tight_layout()
 
@@ -84,28 +87,56 @@ class MetaABCAnalysis:
         for i, txt in enumerate(self.states):
             plt.annotate(txt, ( max_cumulative_cases[i],num_successful_trials[i]))
 
-        #plt.xscale('log')
+        plt.xscale('log')
         plt.xlabel('Max Cumulative Cases')
-        #plt.yscale('log')
+        plt.yscale('log')
         plt.ylabel('Number of Accepted Samples')
         plt.show()
 
         # for abca, state in zip(self.abcas, self.states):
         #     print(state,abca.number_successful_trials())
 
+    def visualize_sample_counts_vs_len_time_series(self):
+
+        num_successful_trials = [abca.number_successful_trials() for abca in self.abcas]
+        len_cumulative_cases = [len(abca.cumulative_cases_data) for abca in self.abcas]
+
+        plt.scatter(len_cumulative_cases,num_successful_trials)
+
+        for i, txt in enumerate(self.states):
+            plt.annotate(txt, ( len_cumulative_cases[i],num_successful_trials[i]))
+
+        plt.xscale('log')
+        plt.xlabel('Number of Days in First Wave')
+        plt.yscale('log')
+        plt.ylabel('Number of Accepted Samples')
+        plt.show()
+
+
 
     def plot_map_of_MAPS(self,param):
 
-        self.MAPS = [abca.get_MAP(param) for abca in self.abcas]
-        print(self.MAPS)
+        MAPS = []
+        states = []
+        for abca in self.abcas:
+            try:
+                MAPS.append(abca.get_MAP(param))
+                states.append(abca.state.upper())
+            except:
+                continue
+
+        fig = px.choropleth(locations=states, locationmode="USA-states", color=MAPS, color_continuous_scale='Viridis', scope="usa")
+        fig.show()
+        
 
 
 
 if __name__ == "__main__":
 
-    mabca = MetaABCAnalysis('state_sweep_3')
+    mabca = MetaABCAnalysis('state_sweep_pw')
     mabca.plot_map_of_MAPS('r0')
     mabca.visualize_sample_counts()
+    mabca.visualize_sample_counts_vs_len_time_series()
     mabca.plot_posteriors()
 
 

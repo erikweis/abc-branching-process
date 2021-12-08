@@ -41,13 +41,13 @@ class ABCAnalysis:
 
     def pairplot(self):
 
-        sns.pairplot(self.successful_trials_df,vars=['R0','k','recovery'],diag_kws=dict(bins=20))
+        sns.pairplot(self.successful_trials_df,vars=['r0','k','r'],diag_kws=dict(bins=20))
         plt.show()
 
 
     def jointplot_R0_k(self,successful_trials_only=True):
 
-        sns.jointplot(data=self.successful_trials_df,x='R0',y='k')
+        sns.jointplot(data=self.successful_trials_df,x='r0',y='k')
         plt.show()
 
 
@@ -58,7 +58,7 @@ class ABCAnalysis:
     def plot_results(self):
 
         #plot error bounds
-        c = np.array(self.cumulative_cases_data)
+        c = np.array(self.cumulative_cases_data[:-1])
         lower_bound = c + c*0.5 
         upper_bound = c - c*0.5 
         plt.fill_between(np.arange(len(c)),lower_bound,upper_bound,alpha=0.2)
@@ -67,33 +67,35 @@ class ABCAnalysis:
         for index,row in self.successful_trials_df.iterrows():
             d = eval(row['cumulative_cases_simulated'])
             print(d)
-            plt.plot(d,color='blue',alpha=1)
+            plt.plot(d,color='blue',alpha=0.1)
 
-        plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
+        plt.plot(c,color='red',linewidth = 2)
         plt.show()
 
     def get_MAP(self,param,test_range=(0,10)):
         
         kernel = gaussian_kde(self.successful_trials_df[param].values)
-        return max(kernel(np.linspace(*test_range,1000)))
+        x = np.linspace(*test_range,1000)
+        index =  np.argmax(kernel(x))
+        return x[index]
 
 
     def plot_data_and_error_bar(self):
 
         #plot error bounds
-        c = np.array(self.cumulative_cases_data)
-        lower_bound = c + c*0.5 
-        upper_bound = c - c*0.5 
+        c = np.array(self.cumulative_cases_data[:-1])
+        lower_bound = c + c*self.error*2
+        upper_bound = c - c*self.error*2
         plt.fill_between(np.arange(len(c)),lower_bound,upper_bound,alpha=0.2)
 
         #plot data
-        plt.plot(self.cumulative_cases_data,color='red',linewidth = 2)
+        plt.plot(c,color='red',linewidth = 2)
         plt.show()
 
 if __name__ == "__main__":
     
     #specify a foldername
-    foldername = ''
+    foldername = 'state_sweep_pw/state_sweep_pw_AK'
 
     #if no foldername specified, use the most recent dated folder
     if not foldername:
@@ -102,12 +104,13 @@ if __name__ == "__main__":
         print("Analyzing folder {}".format(foldername))
 
     #create analysis object with foldername
-    abca = ABCAnalysis(foldername)
+    abca = ABCAnalysis(foldername,state='ak')
     print(abca.number_successful_trials())
 
     #make pairplot
     abca.plot_results()
     #abca.plot_data_and_error_bar()
+    abca.pairplot()
     abca.pairplot_R0_k()
     abca.jointplot_R0_k()
     #abca.plot_results()
