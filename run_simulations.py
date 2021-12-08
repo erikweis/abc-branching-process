@@ -31,13 +31,13 @@ class SimulationRunner:
         #get output directory
         # if subdir == "None":
         #     subdir = None
+        print("non-parametric:",self.non_parametric)
+
         dirname = foldername if foldername else datetime.now().strftime("%m-%d_%H-%M-%S")
-        print("dirname=",dirname)
+
         if subdir:
             self.dirpath = os.path.join('simulations', subdir, dirname)
-            print('there is a subdir')
         else:
-            print('there is no subdir')
             self.dirpath = os.path.join('simulations',dirname)
         os.mkdir(self.dirpath)
 
@@ -94,6 +94,7 @@ class SimulationRunner:
             if isinstance(output,str) and output.startswith('Failure'):
                 trial_successes.append(0)
             else:
+                print("success",vals)
                 trial_successes.append(1)
                 if self.non_parametric:
                     results_dict = {f'p_{i}':vals[i] for i in range(10)}

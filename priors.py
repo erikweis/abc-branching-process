@@ -20,7 +20,6 @@ def non_parametric_priors():
     return  probs
 
 
-
 def normal_priors():
     
     r0,k,r = -1,-1,-1
@@ -60,4 +59,4 @@ def plot_nonparametric_priors(prior_func, samples = 1000):
 if __name__ == "__main__":
 
     plot_priors(normal_priors,samples=10000)
-    plot_nonparametric_priors(non_parametric_priors, samples = 10000)
+    #plot_nonparametric_priors(non_parametric_priors, samples = 10000)
