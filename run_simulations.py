@@ -116,12 +116,15 @@ class SimulationRunner:
         
     def __exit__(self):
 
-         # save successful trials to df
-         filepath = os.path.join(self.dirpath,'successful_trials.csv')
-         if not os.path.isfile(filepath):
+        print("in exit func")
+        # save successful trials to df
+        filepath = os.path.join(self.dirpath,'successful_trials.csv')
+        if not os.path.isfile(filepath):
             df = pd.DataFrame(self.successful_trials_data)
             df.to_csv(filepath)
-            
+
+        return False
+
 
 if __name__=='__main__':
     
