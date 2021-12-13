@@ -62,7 +62,7 @@ def simulate_branching_process(r0=None, k=None, r = 0, ps = None, res = None, st
     infect_vec = np.zeros(cutoff_time)
 
     # Check the values here for the ABC
-    checkpoints = np.arange(15,cutoff_time)
+    checkpoints = np.arange(25,cutoff_time)
 
     infect_vec[0] = res # Resevoir
     for i in range(1, cutoff_time):

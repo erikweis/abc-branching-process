@@ -78,7 +78,7 @@ if __name__ == "__main__":
     #     get_state_data(state.lower(),save=True)
 
     #### test peak detection ######
-    for state in states[40:]:
+    for state in states:
         df = pd.read_csv(f'data/{state.lower()}.csv')
         add_new_cases_column(df)
         test_peak_detection(df,state)

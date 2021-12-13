@@ -41,7 +41,7 @@ class ABCAnalysis:
 
     def pairplot(self):
 
-        sns.pairplot(self.successful_trials_df,vars=['r0','k','r'],diag_kws=dict(bins=20))
+        sns.pairplot(self.successful_trials_df,vars=['r0','k','r','res'],diag_kws=dict(bins=20))
         plt.show()
 
 

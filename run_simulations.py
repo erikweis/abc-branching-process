@@ -101,7 +101,7 @@ class SimulationRunner:
                     results_dict.update({'trialID':index, 'cumulative_cases_simulated':output})       
                     self.successful_trials_data.append(results_dict) 
                 else:
-                    results_dict = {'trialID':index, 'cumulative_cases_simulated':output,'r0':r0,'k':k,'r':r}
+                    results_dict = {'trialID':index, 'cumulative_cases_simulated':output,'r0':r0,'k':k,'r':r,'res':res}
                     self.successful_trials_data.append(results_dict)
 
         # add trial success to data
