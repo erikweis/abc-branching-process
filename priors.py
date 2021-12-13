@@ -26,7 +26,7 @@ def normal_priors():
     while (r0<0 or k<0 or k>1 or r<0 or r>1):
         r0 = scipy.stats.norm.rvs(3.2,1.3)
         k = scipy.stats.uniform.rvs(0,0.05) #scipy.stats.norm.rvs(0.5,0.7)
-        r = scipy.stats.norm.rvs(0.5,1)
+        r = scipy.stats.norm.rvs(0.1,0.5)
     
     return r0,k,r
 
