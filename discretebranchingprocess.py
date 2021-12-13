@@ -34,12 +34,15 @@ def non_parametric_pull(ps):
 def simulation_within_threshold(cumulative_cases_simulated, cumulative_cases_data,threshold=0.5):
 
     """Returns true if the simulation is within threshold and False if the simulation should stop."""
-
+    
     error = np.abs(cumulative_cases_simulated - cumulative_cases_data) / cumulative_cases_data
+    
+    if error <= threshold:
+        print("true")
     return error <= threshold
 
 
-def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',threshold=0):
+def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',threshold=0.5):
 
     """ Simulate a branching process with {cutoff_time} steps,
     according to parameters R0 and K, drawn from prior beta
@@ -61,9 +64,9 @@ def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',thr
     infect_vec = np.zeros(cutoff_time)
 
     # Check the values here for the ABC
-    checkpoints = np.arange(15,cutoff_time)
+    checkpoints = np.arange(25,cutoff_time)
 
-    infect_vec[0] = 1 # Resevoir
+    infect_vec[0] = priors.res_prior() # Resevoir
     for i in range(1, cutoff_time):
 
         temp = 0
@@ -78,17 +81,17 @@ def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',thr
         infect_vec[i] = trans_vec[i] + binom_pull(r, infect_vec[i - 1])        
 
         if i in checkpoints:
-            if not simulation_within_threshold(np.sum(trans_vec), cumulative_cases_data[i],threshold):
-                #print(f"failure at time {i}", np.sum(trans_vec))
-                return f"Failure at {i}", False
-        elif i<min(checkpoints) and np.sum(trans_vec)>max(cumulative_cases_data)/2:
+            if not simulation_within_threshold(np.sum(trans_vec)+infect_vec[0], cumulative_cases_data[i],threshold):
+                print(f"failure at time {i}", np.sum(trans_vec)+infect_vec[0])
+                return f"Failure at {i}", False, infect_vec[0]
+        elif i<min(checkpoints) and (np.sum(trans_vec)+infect_vec[0])>max(cumulative_cases_data)*1.5:
             #double check the branching process isn't going crazy right away
-            return f"Failure at {i}", False
+            return f"Failure (different) at {i}", False, infect_vec[0]
 
     #calculate cumulative_cases
-    cumulative_cases_simulated = [int(np.sum(trans_vec[0:i]) + 1) for i in range(1,cutoff_time)] #add 1 for initial case
+    cumulative_cases_simulated = [int(np.sum(trans_vec[0:i]) + infect_vec[0]) for i in range(1,cutoff_time)] #add initial pop 
 
-    return cumulative_cases_simulated, True     
+    return cumulative_cases_simulated, True, infect_vec[0]    
 
 
 def main(args):
@@ -108,12 +111,16 @@ def main(args):
 
 def trial_run():
     r0, k, r = priors.normal_priors()
-    output, success = simulate_branching_process(r0,k,r, state = "vt", )
-    if not success:
-        return 0
-    else: 
-        print(output)
+    output, success, res= simulate_branching_process(r0,k,r, state = "vt", threshold = 0.5)
+    if  success:
+        print(r0)
+        print(k)
+        print(r)
+        print(res)
         return 1
+    else: 
+        # print(output)
+        return 0
     
 
 if __name__ == "__main__":
@@ -133,7 +140,7 @@ if __name__ == "__main__":
     # main(args)
 
 count = 0
-for i in range(10000):
+for i in range(1000):
     temp = trial_run()
     count = count + temp
     
