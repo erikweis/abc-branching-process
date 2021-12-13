@@ -2,6 +2,7 @@ import scipy.stats
 import numpy as np
 from seaborn.distributions import kdeplot
 import matplotlib.pyplot as plt
+from scipy.stats import truncnorm
 
 def non_parametric_priors():
     probs = []
@@ -19,15 +20,25 @@ def non_parametric_priors():
     
     return  probs
 
+def get_truncnorm(min_val, max_val, mean, std):
+
+    a,b = (min_val - mean)/std , (max_val - mean)/std
+    return truncnorm(a,b,scale=std,loc=mean).rvs()
+
 
 def normal_priors():
     
-    r0,k,r = -1,-1,-1
-    while (r0<0 or k<0 or k>1 or r<0 or r>1):
-        r0 = scipy.stats.norm.rvs(3.2,1.3)
-        k = scipy.stats.norm.rvs(0.5,0.7)
-        r = scipy.stats.norm.rvs(0.5,0.5)
-        res = np.random.randint(3,20)
+    r0 = get_truncnorm(1, 10, 3.2, 1.3)
+    k = get_truncnorm(0, 1, 0.5, 0.7)
+    r = get_truncnorm(0, 1, 0.5, 0.5)
+    res = np.random.randint(10,20)
+
+    # r0,k,r = -1,-1,-1
+    # while (r0<0 or k<0 or k>1 or r<0 or r>1):
+    #     r0 = scipy.stats.norm.rvs(3.2,1.3)
+    #     k = scipy.stats.norm.rvs(0.5,0.7)
+    #     r = scipy.stats.norm.rvs(0.5,0.5)
+    #     res = np.random.randint(3,20)
     
     return r0,k,r, res
 
@@ -67,5 +78,5 @@ def plot_nonparametric_priors(prior_func, samples = 1000):
 
 if __name__ == "__main__":
 
-    plot_priors(normal_priors,samples=100000)
+    plot_priors(normal_priors,samples=1000)
     #plot_nonparametric_priors(non_parametric_priors, samples = 10000)
