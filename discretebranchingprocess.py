@@ -8,6 +8,7 @@ import sys
 import argparse
 from typing import Iterable
 import math
+import priors
 
 import logging
 
@@ -62,7 +63,7 @@ def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',thr
     # Check the values here for the ABC
     checkpoints = np.arange(15,cutoff_time)
 
-    infect_vec[0] = 1
+    infect_vec[0] = 20 # Resevoir
     for i in range(1, cutoff_time):
 
         temp = 0
@@ -78,16 +79,16 @@ def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',thr
 
         if i in checkpoints:
             if not simulation_within_threshold(np.sum(trans_vec), cumulative_cases_data[i],threshold):
-                print(f"failure at time {i}", np.sum(trans_vec))
-                return f"Failure at {i}"
+               # print(f"failure at time {i}", np.sum(trans_vec))
+                return f"Failure at {i}", False
         elif i<min(checkpoints) and np.sum(trans_vec)>max(cumulative_cases_data)/2:
             #double check the branching process isn't going crazy right away
-            return f"Failure at {i}"
+            return f"Failure at {i}", False
 
     #calculate cumulative_cases
     cumulative_cases_simulated = [int(np.sum(trans_vec[0:i]) + 1) for i in range(1,cutoff_time)] #add 1 for initial case
 
-    return cumulative_cases_simulated        
+    return cumulative_cases_simulated, True     
 
 
 def main(args):
@@ -104,6 +105,16 @@ def main(args):
         threshold = args.error
     )
 
+
+def trial_run():
+    r0, k, r = priors.normal_priors()
+    output, success = simulate_branching_process(r0,k,r, state = "vt", )
+    if not success:
+        return 0
+    else: 
+        print(output)
+        return 1
+    
 
 if __name__ == "__main__":
     pass
