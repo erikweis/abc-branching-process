@@ -27,14 +27,9 @@ def normal_priors():
         r0 = scipy.stats.norm.rvs(3.2,1.3)
         k = scipy.stats.norm.rvs(0.5,0.7)
         r = scipy.stats.norm.rvs(0.5,0.5)
+        res = np.random.randint(3,20)
     
-    return r0,k,r
-
-def res_prior():
-    
-    res = np.random.randint(3,20)
-    
-    return res
+    return r0,k,r, res
 
 
 def uniform_priors():

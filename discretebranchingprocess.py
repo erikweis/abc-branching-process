@@ -36,13 +36,11 @@ def simulation_within_threshold(cumulative_cases_simulated, cumulative_cases_dat
     """Returns true if the simulation is within threshold and False if the simulation should stop."""
     
     error = np.abs(cumulative_cases_simulated - cumulative_cases_data) / cumulative_cases_data
-    
-    if error <= threshold:
-        print("true")
+
     return error <= threshold
 
 
-def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',threshold=0.5):
+def simulate_branching_process(r0=None, k=None, r = 0, ps = None, res = None, state='vt',threshold=0.5):
 
     """ Simulate a branching process with {cutoff_time} steps,
     according to parameters R0 and K, drawn from prior beta
@@ -64,9 +62,9 @@ def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',thr
     infect_vec = np.zeros(cutoff_time)
 
     # Check the values here for the ABC
-    checkpoints = np.arange(25,cutoff_time)
+    checkpoints = np.arange(15,cutoff_time)
 
-    infect_vec[0] = priors.res_prior() # Resevoir
+    infect_vec[0] = res # Resevoir
     for i in range(1, cutoff_time):
 
         temp = 0
@@ -82,16 +80,16 @@ def simulate_branching_process(r0=None, k=None, r = 0, ps = None, state='vt',thr
 
         if i in checkpoints:
             if not simulation_within_threshold(np.sum(trans_vec)+infect_vec[0], cumulative_cases_data[i],threshold):
-                print(f"failure at time {i}", np.sum(trans_vec)+infect_vec[0])
-                return f"Failure at {i}", False, infect_vec[0]
+                # print(f"failure at time {i}", np.sum(trans_vec)+infect_vec[0])
+                return f"Failure at {i}"
         elif i<min(checkpoints) and (np.sum(trans_vec)+infect_vec[0])>max(cumulative_cases_data)*1.5:
             #double check the branching process isn't going crazy right away
-            return f"Failure (different) at {i}", False, infect_vec[0]
+            return f"Failure (different) at {i}"
 
     #calculate cumulative_cases
     cumulative_cases_simulated = [int(np.sum(trans_vec[0:i]) + infect_vec[0]) for i in range(1,cutoff_time)] #add initial pop 
 
-    return cumulative_cases_simulated, True, infect_vec[0]    
+    return cumulative_cases_simulated 
 
 
 def main(args):
@@ -139,9 +137,9 @@ if __name__ == "__main__":
 
     # main(args)
 
-count = 0
-for i in range(1000):
-    temp = trial_run()
-    count = count + temp
+# count = 0
+# for i in range(1000):
+#     temp = trial_run()
+#     count = count + temp
     
-print(count)
+# print(count)

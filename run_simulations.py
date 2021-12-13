@@ -56,14 +56,16 @@ class SimulationRunner:
             r0List = []
             kList = []
             rList = []
+            resList = []
             for i in range(num_trials):
-                R0, k, r = normal_priors()
+                R0, k, r,res = normal_priors()
                 r0List.append(R0)
                 kList.append(k)
                 rList.append(r)
+                resList.append(res)
 
             #save csv
-            paramDF = pd.DataFrame(list(zip(r0List, kList, rList)), columns = ['R0', 'k', 'recovery'])
+            paramDF = pd.DataFrame(list(zip(r0List, kList, rList,resList)), columns = ['R0', 'k', 'recovery','res'])
             paramDF.to_csv(os.path.join(self.dirpath,'trials.csv'))
             self.paramDF = paramDF
         
@@ -85,8 +87,8 @@ class SimulationRunner:
             if self.non_parametric:
                 output = simulate_branching_process(ps=vals,state = self.state,threshold=self.error)
             else:
-                r0,k,r = vals
-                output = simulate_branching_process(r0=r0,k=k,r=r,state = self.state,threshold = self.error)
+                r0,k,r,res = vals
+                output = simulate_branching_process(r0=r0,k=k,r=r,res=res,state = self.state,threshold = self.error)
 
             # check for failure
             if isinstance(output,str) and output.startswith('Failure'):

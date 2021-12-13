@@ -95,16 +95,23 @@ class ABCAnalysis:
 if __name__ == "__main__":
     
     #specify a foldername
-    foldername = 'state_sweep_pw/state_sweep_pw_AK'
+    foldername = ''
 
     #if no foldername specified, use the most recent dated folder
     if not foldername:
         folders = [f for f in os.listdir('simulations/') if not f.startswith('.')]
-        foldername = max(folders,key=lambda f: datetime.strptime(f,"%m-%d_%H-%M-%S"))
+        
+        dts = []
+        for f in folders:
+            try:
+                dts.append(datetime.strptime(f,"%m-%d_%H-%M-%S"))
+            except:
+                continue
+        foldername = datetime.strftime(max(dts),"%m-%d_%H-%M-%S")  #max(dts,key=lambda f: datetime.strptime(f,"%m-%d_%H-%M-%S"))
         print("Analyzing folder {}".format(foldername))
 
     #create analysis object with foldername
-    abca = ABCAnalysis(foldername,state='ak')
+    abca = ABCAnalysis(foldername)
     print(abca.number_successful_trials())
 
     #make pairplot
