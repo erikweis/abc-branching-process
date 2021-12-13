@@ -104,6 +104,11 @@ class SimulationRunner:
                     results_dict = {'trialID':index, 'cumulative_cases_simulated':output,'r0':r0,'k':k,'r':r,'res':res}
                     self.successful_trials_data.append(results_dict)
 
+            #save data every 1000 time steps
+            if index%100 == 0:
+                df = pd.DataFrame(self.successful_trials_data)
+                df.to_csv(os.path.join(self.dirpath,'successful_trials.csv'))
+
         # add trial success to data
         self.paramDF['trial_success'] = trial_successes
         self.paramDF.to_csv(os.path.join(self.dirpath,'trials.csv'))

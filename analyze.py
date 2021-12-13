@@ -9,11 +9,10 @@ import numpy as np
 
 class ABCAnalysis:
 
-    def __init__(self,path,state='vt'):
+    def __init__(self,path,state='vt',sv = 15):
 
         self.dirpath = os.path.join('simulations',path)
         self.df = pd.read_csv(os.path.join(self.dirpath,'trials.csv'))
-        self.successful_trials_df = pd.read_csv(os.path.join(self.dirpath,'successful_trials.csv'))
 
         #load params
         with open(os.path.join(self.dirpath,'hyperparams.json')) as f:
@@ -25,6 +24,15 @@ class ABCAnalysis:
         # load cumulative cases data
         data_path = os.path.join('data',f'{self.state}_first_peak.csv')
         self.cumulative_cases_data = pd.read_csv(data_path).values[:,1]
+
+        #successful trials df
+        self.successful_trials_df = pd.read_csv(os.path.join(self.dirpath,'successful_trials.csv'))
+        print(self.successful_trials_df.columns)
+        lb, ub = self.get_bounds()
+        def func(x):
+            return lb[sv]< eval(x['cumulative_cases_simulated'])[sv] < ub[sv]
+        self.successful_trials_df['strict'] = self.successful_trials_df.apply(func, axis=1)
+        
 
 
     def number_successful_trials(self):
@@ -41,7 +49,7 @@ class ABCAnalysis:
 
     def pairplot(self):
 
-        sns.pairplot(self.successful_trials_df,vars=['r0','k','r','res'],diag_kws=dict(bins=20))
+        sns.pairplot(self.successful_trials_df,vars=['r0','k','r','res'],hue='strict') #,diag_kws=dict(bins=20))
         plt.show()
 
 
@@ -54,20 +62,28 @@ class ABCAnalysis:
     def plot_priors(self):
         pass
 
+    
+    def get_bounds(self):
+
+        c = np.array(self.cumulative_cases_data[:-1])
+        return c - c*self.error, c + c*self.error
+
 
     def plot_results(self):
 
         #plot error bounds
         c = np.array(self.cumulative_cases_data[:-1])
-        lower_bound = c + c*0.5 
-        upper_bound = c - c*0.5 
+        lower_bound, upper_bound = self.get_bounds()
         plt.fill_between(np.arange(len(c)),lower_bound,upper_bound,alpha=0.2)
 
         #plot simulated results
         for index,row in self.successful_trials_df.iterrows():
+
             d = eval(row['cumulative_cases_simulated'])
-            print(d)
-            plt.plot(d,color='blue',alpha=0.1)
+            
+            v = 15
+            if lower_bound[v] < d[v] < upper_bound[v]:   
+                plt.plot(d,color='blue',alpha=0.1)
 
         plt.plot(c,color='red',linewidth = 2)
         plt.show()
@@ -118,6 +134,6 @@ if __name__ == "__main__":
     abca.plot_results()
     #abca.plot_data_and_error_bar()
     abca.pairplot()
-    abca.pairplot_R0_k()
-    abca.jointplot_R0_k()
+    #abca.pairplot_R0_k()
+    #abca.jointplot_R0_k()
     #abca.plot_results()
