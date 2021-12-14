@@ -31,7 +31,7 @@ def normal_priors():
     r0 = get_truncnorm(1, 7, 3.2, 1.3)
     k = get_truncnorm(0, 0.5, 0.25, 0.5)
     r = get_truncnorm(0, 1, 0.5, 2)
-    res = np.random.randint(0,100)
+    res = np.random.randint(0,40)
     
     return r0,k,r, res
 
