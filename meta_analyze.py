@@ -34,46 +34,36 @@ class MetaABCAnalysis:
 
         dfs = [abca.successful_trials_df for abca in self.abcas]
         
-        fig, axes = plt.subplots(1,3,figsize=(10,4))
+        fig, axes = plt.subplots(2,2,figsize=(8,8))
         
         for df,state in tqdm(zip(dfs,self.states)):
             try:
-                r0_x = np.linspace(0,6.5,200)
-                k_x = np.linspace(0,0.07,200)
-                r_x = np.linspace(0,0.5,200)
+                r0_x = np.linspace(0.8,6,200)
+                k_x = np.linspace(0,0.25,200)
+                r_x = np.linspace(0,0.9,200)
+                res_x = np.linspace(5,15)
 
                 r0_y = gaussian_kde(df['r0']).pdf(r0_x)
                 k_y = gaussian_kde(df['k']).pdf(k_x)
                 r_y = gaussian_kde(df['r']).pdf(r_x)
+                res_y = gaussian_kde(df['res']).pdf(res_x)
 
                 color = 'red' if state.lower()=='vt' else 'steelblue'
                 alpha = 1 if state.lower() =='vt' else 0.3
 
-                axes[0].plot(r0_x,r0_y,color=color,alpha=alpha)
-                axes[1].plot(k_x,k_y,color=color,alpha=alpha)
-                axes[2].plot(r_x,r_y,color=color,alpha=alpha)
+                axes[0][0].plot(r0_x,r0_y,color=color,alpha=alpha)
+                axes[0][1].plot(k_x,k_y,color=color,alpha=alpha)
+                axes[1][0].plot(r_x,r_y,color=color,alpha=alpha)
+                axes[1][1].plot(res_x,res_y,color=color,alpha=alpha)
             except:
                 continue
         
-        axes[0].set_title('r0')
-        axes[1].set_title('k')
-        axes[2].set_title('recovery')
+        axes[0][0].set_title('r0')
+        axes[0][1].set_title('k')
+        axes[1][0].set_title('recovery')
+        axes[1][1].set_title('reservoir')
 
         fig.tight_layout()
-
-        # for nshape,seg in enumerate(m.states):
-        #     # skip DC and Puerto Rico.
-        #     if statenames[nshape] not in ['Puerto Rico', 'District of Columbia']:
-        #     # Offset Alaska and Hawaii to the lower-left corner. 
-        #         if statenames[nshape] == 'Alaska':
-        #         # Alaska is too big. Scale it down to 35% first, then transate it. 
-        #             seg = list(map(lambda (x,y): (0.35*x + 1100000, 0.35*y-1300000), seg))
-        #         if statenames[nshape] == 'Hawaii':
-        #             seg = list(map(lambda (x,y): (x + 5100000, y-900000), seg))
-
-        #         color = rgb2hex(colors[statenames[nshape]]) 
-        #         poly = Polygon(seg,facecolor=color,edgecolor=color)
-        #         ax.add_patch(poly)
 
         plt.show()
 
@@ -112,6 +102,23 @@ class MetaABCAnalysis:
         plt.ylabel('Number of Accepted Samples')
         plt.show()
 
+    def len_time_vs_max_cum_cases(self):
+
+        max_cumulative_cases = [max(abca.cumulative_cases_data) for abca in self.abcas]
+        len_cumulative_cases = [len(abca.cumulative_cases_data) for abca in self.abcas]
+
+        
+
+        plt.scatter(max_cumulative_cases,len_cumulative_cases)
+
+        for i, txt in enumerate(self.states):
+            plt.annotate(txt, ( max_cumulative_cases[i],len_cumulative_cases[i]))
+
+        plt.xlabel('Max Number of Cumulative Cases')
+        plt.ylabel('Number of Days in Time Series')
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.show()
 
 
     def plot_map_of_MAPS(self,param):
@@ -133,11 +140,17 @@ class MetaABCAnalysis:
 
 if __name__ == "__main__":
 
-    mabca = MetaABCAnalysis('state_sweep_pw')
-    mabca.plot_map_of_MAPS('r0')
-    mabca.visualize_sample_counts()
-    mabca.visualize_sample_counts_vs_len_time_series()
-    mabca.plot_posteriors()
+    mabca = MetaABCAnalysis('ss2')
+
+    for abca in mabca.abcas:
+        if abca.state.upper() in ['NC','IL','WI','OH','NY','VT']:
+            abca.plot_results()
+
+    #mabca.plot_map_of_MAPS('r0')
+    #mabca.len_time_vs_max_cum_cases()
+    #mabca.visualize_sample_counts()
+    #mabca.visualize_sample_counts_vs_len_time_series()
+    #mabca.plot_posteriors()
 
 
         

@@ -20,22 +20,24 @@ class ABCAnalysis:
                 self.__setattr__(k,v)
 
         self.state = state
-        
+        self.sv = sv
+ 
         # load cumulative cases data
         data_path = os.path.join('data',f'{self.state}_first_peak.csv')
         self.cumulative_cases_data = pd.read_csv(data_path).values[:,1]
 
         #successful trials df
         self.successful_trials_df = pd.read_csv(os.path.join(self.dirpath,'successful_trials.csv'))
-        print(self.successful_trials_df.columns)
-        lb, ub = self.get_bounds()
+
         def func(x):
-            return lb[sv]< eval(x['cumulative_cases_simulated'])[sv] < ub[sv]
+            return self.strict_check(eval(x['cumulative_cases_simulated']))
         self.successful_trials_df['strict'] = self.successful_trials_df.apply(func, axis=1)
         
 
 
-    def number_successful_trials(self):
+    def number_successful_trials(self,strict=False):
+        if strict:
+            return sum(self.successful_trials_df['strict'])
         return len(self.successful_trials_df)
 
 
@@ -68,6 +70,17 @@ class ABCAnalysis:
         c = np.array(self.cumulative_cases_data[:-1])
         return c - c*self.error, c + c*self.error
 
+    def strict_check(self,cumulative_cases_simulated):
+
+        lower_bound, upper_bound = self.get_bounds()
+
+        add = True
+        for v in np.arange(self.sv,len(cumulative_cases_simulated)-1):
+            if not lower_bound[v] < cumulative_cases_simulated[v] < upper_bound[v]:
+                add = False
+                break
+
+        return add
 
     def plot_results(self):
 
@@ -81,11 +94,11 @@ class ABCAnalysis:
 
             d = eval(row['cumulative_cases_simulated'])
             
-            v = 15
-            if lower_bound[v] < d[v] < upper_bound[v]:   
+            if self.strict_check(d):
                 plt.plot(d,color='blue',alpha=0.1)
 
         plt.plot(c,color='red',linewidth = 2)
+        plt.title(self.state)
         plt.show()
 
     def get_MAP(self,param,test_range=(0,10)):
@@ -127,8 +140,8 @@ if __name__ == "__main__":
         print("Analyzing folder {}".format(foldername))
 
     #create analysis object with foldername
-    abca = ABCAnalysis(foldername)
-    print(abca.number_successful_trials())
+    abca = ABCAnalysis(foldername,sv=15)
+    print(abca.number_successful_trials(strict=True))
 
     #make pairplot
     abca.plot_results()

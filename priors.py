@@ -30,15 +30,8 @@ def normal_priors():
     
     r0 = get_truncnorm(1, 7, 3.2, 1.3)
     k = get_truncnorm(0, 0.5, 0.25, 0.5)
-    r = get_truncnorm(0, 0.6, 0.5, 0.5)
-    res = np.random.randint(5,15)
-
-    # r0,k,r = -1,-1,-1
-    # while (r0<0 or k<0 or k>1 or r<0 or r>1):
-    #     r0 = scipy.stats.norm.rvs(3.2,1.3)
-    #     k = scipy.stats.norm.rvs(0.5,0.7)
-    #     r = scipy.stats.norm.rvs(0.5,0.5)
-    #     res = np.random.randint(3,20)
+    r = get_truncnorm(0, 1, 0.5, 2)
+    res = np.random.randint(0,100)
     
     return r0,k,r, res
 

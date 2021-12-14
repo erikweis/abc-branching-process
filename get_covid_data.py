@@ -28,7 +28,8 @@ custom_peaks = {
     'OR':(90,150),
     'SD':(150,255),
     'WV':(100,310),
-    'WY':(175,270)
+    'WY':(175,270),
+    'NY':(15,42)
 }
 
 def get_state_data(abbr,save=False):
@@ -113,12 +114,12 @@ if __name__ == "__main__":
     #     test_peak_detection(df,state)
 
     ###### save only first wave cumulative cases #####
-    # for state in states:
-    #     state=state.lower()
-    #     df = pd.read_csv(f'data/{state}.csv')
-    #     df = add_new_cases_column(df)
-    #     fw = get_first_wave_data(df,state,save=True)
-    #     print(fw[0])
+    for state in states:
+        state=state.lower()
+        df = pd.read_csv(f'data/{state}.csv')
+        df = add_new_cases_column(df)
+        fw = get_first_wave_data(df,state,save=True)
+        print(fw[0])
 
     #plot first waves
 

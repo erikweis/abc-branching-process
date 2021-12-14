@@ -50,5 +50,9 @@ if __name__=='__main__':
         os.mkdir(os.path.join('simulations',args.foldername))
         for state in STATES:
             submit(args.num_trials,state.lower(),args.error,f"{args.foldername}_{state}",subdir=args.foldername,non_parametric=args.non_parametric)
+    elif args.state == 'select':
+        os.mkdir(os.path.join('simulations',args.foldername))
+        for state in ['WI','OH','VT','NY','NC']:
+            submit(args.num_trials,state.lower(),args.error,f"{args.foldername}_{state}",subdir=args.foldername,non_parametric=args.non_parametric)
     else:
         submit(args.num_trials,args.state,args.error,args.foldername,non_parametric=args.non_parametric)
