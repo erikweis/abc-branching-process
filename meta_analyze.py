@@ -40,8 +40,8 @@ class MetaABCAnalysis:
             try:
                 r0_x = np.linspace(0.8,6,200)
                 k_x = np.linspace(0,0.25,200)
-                r_x = np.linspace(0,0.9,200)
-                res_x = np.linspace(5,15)
+                r_x = np.linspace(0,1,200)
+                res_x = np.linspace(0,40)
 
                 r0_y = gaussian_kde(df['r0']).pdf(r0_x)
                 k_y = gaussian_kde(df['k']).pdf(k_x)
@@ -107,8 +107,6 @@ class MetaABCAnalysis:
         max_cumulative_cases = [max(abca.cumulative_cases_data) for abca in self.abcas]
         len_cumulative_cases = [len(abca.cumulative_cases_data) for abca in self.abcas]
 
-        
-
         plt.scatter(max_cumulative_cases,len_cumulative_cases)
 
         for i, txt in enumerate(self.states):
@@ -140,17 +138,23 @@ class MetaABCAnalysis:
 
 if __name__ == "__main__":
 
-    mabca = MetaABCAnalysis('ss2')
+    mabca = MetaABCAnalysis('select_sweep')
+
+    # for abca in mabca.abcas:
+    #     if abca.state.upper() in ['WI','OH','VT','NY','NC']:
+    #         abca.plot_results()
 
     for abca in mabca.abcas:
-        if abca.state.upper() in ['NC','IL','WI','OH','NY','VT']:
+        print(abca.state,abca.number_successful_trials())
+        if abca.number_successful_trials():
+            abca.pairplot()
             abca.plot_results()
 
     #mabca.plot_map_of_MAPS('r0')
     #mabca.len_time_vs_max_cum_cases()
-    #mabca.visualize_sample_counts()
-    #mabca.visualize_sample_counts_vs_len_time_series()
-    #mabca.plot_posteriors()
+    # mabca.visualize_sample_counts()
+    # mabca.visualize_sample_counts_vs_len_time_series()
+    # mabca.plot_posteriors()
 
 
         

@@ -26,22 +26,30 @@ def get_truncnorm(min_val, max_val, mean, std):
     return truncnorm(a,b,scale=std,loc=mean).rvs()
 
 
-def normal_priors():
+def normal_priors(state='vt'):
+
+    print(state)
+    if state=='wi':
+        r0 = get_truncnorm(2, 8, 4.5, 1.5)
+        k = get_truncnorm(0, 0.5, 0.1, 0.2)
+        r = get_truncnorm(0, 1, 0.8, 0.1)
+        res = np.random.randint(0,40)
+    else:
     
-    r0 = get_truncnorm(1, 7, 3.2, 1.3)
-    k = get_truncnorm(0, 0.5, 0.25, 0.5)
-    r = get_truncnorm(0, 1, 0.5, 2)
-    res = np.random.randint(0,40)
+        r0 = get_truncnorm(1, 7, 3.2, 1.3)
+        k = get_truncnorm(0, 0.5, 0.13, 0.5)
+        r = get_truncnorm(0, 1, 0.7, 0.1)
+        res = np.random.randint(0,40)
     
-    return r0,k,r, res
+    return r0, k, r, res
 
 
 def uniform_priors():
     return [scipy.stats.uniform.rvs(1,5), scipy.stats.uniform.rvs(0.5,1.5), scipy.stats.uniform.rvs(0,0.6)]
 
-def plot_priors(prior_func, samples=1000):
+def plot_priors(prior_func, samples=1000,state='vt'):
 
-    samples = np.array([prior_func() for _ in range(samples)])
+    samples = np.array([prior_func(state) for _ in range(samples)])
 
     fig, ax = plt.subplots(1,3,figsize=(9,3))
 
@@ -71,5 +79,5 @@ def plot_nonparametric_priors(prior_func, samples = 1000):
 
 if __name__ == "__main__":
 
-    plot_priors(normal_priors,samples=1000)
+    plot_priors(normal_priors,samples=1000,state='wi')
     #plot_nonparametric_priors(non_parametric_priors, samples = 10000)

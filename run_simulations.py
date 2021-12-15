@@ -58,7 +58,7 @@ class SimulationRunner:
             rList = []
             resList = []
             for i in range(num_trials):
-                R0, k, r,res = normal_priors()
+                R0, k, r,res = normal_priors(state)
                 r0List.append(R0)
                 kList.append(k)
                 rList.append(r)

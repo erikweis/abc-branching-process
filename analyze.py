@@ -2,6 +2,8 @@ import pandas as pd
 from datetime import datetime
 import os
 import seaborn as sns
+import matplotlib
+#matplotlib.rcParams['text.usetex'] = True
 import matplotlib.pyplot as plt
 import json
 from scipy.stats import gaussian_kde
@@ -49,11 +51,38 @@ class ABCAnalysis:
         plt.show()
 
 
-    def pairplot(self):
+    def pairplot(self,save=False,strict=False):
 
-        sns.pairplot(self.successful_trials_df,vars=['r0','k','r','res'],hue='strict') #,diag_kws=dict(bins=20))
+        df = self.successful_trials_df
+        if strict:
+            df = df[df['strict']==True]
+            
+        g = sns.pairplot(
+            df,
+            vars=['r0','k','r','res'],
+            plot_kws={'alpha': 0.25}
+        ) #,diag_kws=dict(bins=20))
+
+        replacements = {
+            'r0':'$R_0$',
+            'k':'$k$',
+            'r':'$r$',
+            'res':'$I_{res}$'
+        }
+
+        for i in range(4):
+            for j in range(4):
+                xlabel = g.axes[i][j].get_xlabel()
+                ylabel = g.axes[i][j].get_ylabel()
+                if xlabel in replacements.keys():
+                    g.axes[i][j].set_xlabel(replacements[xlabel])
+                if ylabel in replacements.keys():
+                    g.axes[i][j].set_ylabel(replacements[ylabel])
+
+        if save:
+            plt.savefig(f'figures/{self.state}_pairplot.png')
+        plt.title(self.state)
         plt.show()
-
 
     def jointplot_R0_k(self,successful_trials_only=True):
 
@@ -82,7 +111,7 @@ class ABCAnalysis:
 
         return add
 
-    def plot_results(self):
+    def plot_results(self,save=False,strict=False):
 
         #plot error bounds
         c = np.array(self.cumulative_cases_data[:-1])
@@ -94,10 +123,17 @@ class ABCAnalysis:
 
             d = eval(row['cumulative_cases_simulated'])
             
-            if self.strict_check(d):
+            if strict:
+                if self.strict_check(d):
+                    plt.plot(d,color='blue',alpha=0.1)
+            else:
                 plt.plot(d,color='blue',alpha=0.1)
 
         plt.plot(c,color='red',linewidth = 2)
+        plt.xlabel('Days Since Start of First Wave')
+        plt.ylabel('Cumulative Case Count')
+        if save:
+            plt.savefig(f'figures/{self.state}_results.png')
         plt.title(self.state)
         plt.show()
 
@@ -144,9 +180,9 @@ if __name__ == "__main__":
     print(abca.number_successful_trials(strict=True))
 
     #make pairplot
-    abca.plot_results()
+    abca.plot_results(save=True)
     #abca.plot_data_and_error_bar()
-    abca.pairplot()
+    abca.pairplot(save=True)
     #abca.pairplot_R0_k()
     #abca.jointplot_R0_k()
     #abca.plot_results()
