@@ -14,7 +14,7 @@ class ABCAnalysis:
     def __init__(self,path,state='vt',sv = 15):
 
         self.dirpath = os.path.join('simulations',path)
-        self.df = pd.read_csv(os.path.join(self.dirpath,'trials.csv'))
+        self.df = pd.read_csv(os.path.join(self.dirpath,'trials.csv'),index_col=0)
 
         #load params
         with open(os.path.join(self.dirpath,'hyperparams.json')) as f:
@@ -39,7 +39,7 @@ class ABCAnalysis:
 
     def number_successful_trials(self,strict=False):
         if strict:
-            return sum(self.successful_trials_df['strict'])
+            return sum(self.successful_trials_df['strict'].values)
         return len(self.successful_trials_df)
 
 
@@ -56,7 +56,7 @@ class ABCAnalysis:
         df = self.successful_trials_df
         if strict:
             df = df[df['strict']==True]
-            
+
         g = sns.pairplot(
             df,
             vars=['r0','k','r','res'],
@@ -160,7 +160,7 @@ class ABCAnalysis:
 if __name__ == "__main__":
     
     #specify a foldername
-    foldername = ''
+    foldername = 'custom_wi3'
 
     #if no foldername specified, use the most recent dated folder
     if not foldername:
@@ -176,13 +176,13 @@ if __name__ == "__main__":
         print("Analyzing folder {}".format(foldername))
 
     #create analysis object with foldername
-    abca = ABCAnalysis(foldername,sv=15)
-    print(abca.number_successful_trials(strict=True))
+    abca = ABCAnalysis(foldername,sv=15,state='wi')
+    print(abca.number_successful_trials(strict=False))
 
     #make pairplot
-    abca.plot_results(save=True)
+    abca.plot_results(save=True,strict=False)
     #abca.plot_data_and_error_bar()
-    abca.pairplot(save=True)
+    abca.pairplot(save=True,strict=False)
     #abca.pairplot_R0_k()
     #abca.jointplot_R0_k()
     #abca.plot_results()

@@ -28,7 +28,6 @@ def get_truncnorm(min_val, max_val, mean, std):
 
 def normal_priors(state='vt'):
 
-    print(state)
     if state=='wi':
         r0 = get_truncnorm(2, 8, 4.5, 1.5)
         k = get_truncnorm(0, 0.5, 0.1, 0.2)

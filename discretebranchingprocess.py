@@ -80,7 +80,7 @@ def simulate_branching_process(r0=None, k=None, r = 0, ps = None, res = None, st
 
         if i in checkpoints:
             if not simulation_within_threshold(np.sum(trans_vec)+infect_vec[0], cumulative_cases_data[i],threshold):
-                # print(f"failure at time {i}", np.sum(trans_vec)+infect_vec[0])
+                print(f"failure at time {i}", np.sum(trans_vec)+infect_vec[0])
                 return f"Failure at {i}"
         elif i<min(checkpoints) and (np.sum(trans_vec)+infect_vec[0])>max(cumulative_cases_data)*1.5:
             #double check the branching process isn't going crazy right away
